@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shift Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&display=swap">
+<style>
+/* Layout: dark studio header band with one hazard-stripe rule, then a single working column. Each trade card carries its own discussion. */
+:root{
+  --yellow:#E9BF46; --charcoal:#343434; --steel:#6F6F6F;
+  --bg:#F1F1EF; --surface:#FFFFFF; --sunk:#E7E7E4; --ink:#242424; --muted:#5F5F5F; --line:#D9D8D3;
+  --yellow-soft:#FAEFCC; --yellow-ink:#7A5B00; --on-yellow:#262626;
+  --head:#343434; --head-ink:#F4F4F2; --head-muted:#B9B9B6;
+  --ok:#1F5FBF; --ok-soft:#DDE8F8; --warn:#B3261E; --warn-soft:#F9DEDC; --focus:#1F5FBF;
+  --full:#2E7D46; --prov:#C8650F; --full-soft:#DCEFE2; --prov-soft:#FBE7D3;
+  --f-display:"Century Gothic","CenturyGothic","AppleGothic","Questrial",Arial,sans-serif;
+  --f-body:Arial,Helvetica,sans-serif;
+  --f-mono:Arial,Helvetica,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C1C1C; --surface:#282828; --sunk:#222222; --ink:#ECECEA; --muted:#A6A6A2; --line:#3C3C3C;
+  --yellow-soft:#3A321D; --yellow-ink:#F0CF6E; --on-yellow:#262626;
+  --head:#343434; --head-ink:#F4F4F2; --head-muted:#B0B0AC;
+  --ok:#8AB4FF; --ok-soft:#1C2A40; --warn:#F2B8B5; --warn-soft:#3B1D1B; --focus:#8AB4FF; --full:#3E9A5B; --prov:#D9741C; --full-soft:#1E3326; --prov-soft:#3D2A17; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#1C1C1C; --surface:#282828; --sunk:#222222; --ink:#ECECEA; --muted:#A6A6A2; --line:#3C3C3C;
+  --yellow-soft:#3A321D; --yellow-ink:#F0CF6E; --on-yellow:#262626;
+  --head:#343434; --head-ink:#F4F4F2; --head-muted:#B0B0AC;
+  --ok:#8AB4FF; --ok-soft:#1C2A40; --warn:#F2B8B5; --warn-soft:#3B1D1B; --focus:#8AB4FF; --full:#3E9A5B; --prov:#D9741C; --full-soft:#1E3326; --prov-soft:#3D2A17; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;letter-spacing:0;text-wrap:balance;margin:0;line-height:1.1}
+
+header{background:var(--head);color:var(--head-ink)}
+header .wrap{padding-block:18px 0;display:flex;flex-direction:column;gap:14px}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mark{width:38px;height:38px;border-radius:6px;background:var(--yellow);color:#262626;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:20px;flex:none}
+.brand h1{font-size:26px;text-transform:uppercase;letter-spacing:.04em}
+.brand .sub{font-size:13px;color:var(--head-muted);display:block;letter-spacing:.06em;text-transform:uppercase}
+.who{margin-left:auto;font-size:13px;color:var(--head-muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.who b{color:var(--head-ink);font-weight:600}
+.who .lvl{border-color:var(--head-muted)}
+.who .lvl{border-color:transparent}
+.who button{background:none;border:1px solid var(--head-muted);color:var(--head-ink);border-radius:4px;padding:1px 8px;font-size:12px;cursor:pointer}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tab{background:none;border:0;color:var(--head-muted);padding:10px 13px 12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;display:flex;gap:7px;align-items:center}
+.tab:hover{color:var(--head-ink)}
+.tab[aria-selected="true"]{color:var(--head-ink);border-bottom-color:var(--yellow)}
+.count{background:var(--yellow);color:#262626;border-radius:4px;font-size:12px;padding:0 7px;font-family:var(--f-mono);font-weight:600;line-height:18px}
+.stripe{height:6px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 10px,var(--charcoal) 10px 20px)}
+
+main .wrap{padding-block:22px 64px;display:flex;flex-direction:column;gap:18px}
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;font-size:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner.example,.banner.ann{background:var(--yellow-soft);border-color:transparent}
+.banner b{font-weight:600}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--yellow);color:var(--on-yellow);border-color:var(--yellow)}
+.btn.primary:hover{filter:brightness(.95)}
+.btn.dark{background:var(--charcoal);color:#F4F4F2;border-color:var(--charcoal)}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted);padding-inline:8px}
+.btn.ghost:hover{color:var(--ink)}
+.btn.sm{padding:4px 10px;font-size:13px}
+.btn.danger{color:var(--warn)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.topline{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.topline h2{font-size:26px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.stats b{color:var(--ink);font-family:var(--f-mono);font-weight:600}
+.topline .btn{margin-left:auto}
+
+.foryou{background:var(--yellow-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.foryou h3{font-size:18px}
+.fy{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;padding:4px 0}
+.fy .fytext{flex:1;min-width:180px}
+
+.strip{display:grid;grid-template-columns:repeat(14,minmax(44px,1fr));gap:4px;overflow-x:auto;padding-bottom:4px}
+.dayb{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 2px 7px;text-align:center;cursor:pointer;display:flex;flex-direction:column;gap:1px;align-items:center;min-width:0}
+.dayb .w{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.dayb .n{font-family:var(--f-mono);font-size:15px;font-weight:600}
+.dayb .c{height:16px;display:flex;gap:2px;align-items:center;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pip{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.pip.full{background:var(--full)}
+.pip.provisional{background:var(--prov)}
+.pip.mine{outline:2px solid var(--ink);outline-offset:1px}
+.dayb.closed{background:var(--sunk);border-style:dashed}
+.dayb.closed .n{color:var(--muted)}
+.dayb[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 12px;font-size:13px;font-weight:500;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--charcoal);color:#F4F4F2;border-color:var(--charcoal)}
+.chip .k{font-family:var(--f-mono);opacity:.7;margin-left:4px}
+
+.group{display:flex;flex-direction:column;gap:10px}
+.ghead{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.ghead h3{font-size:20px}
+.ghead span{font-size:13px;color:var(--muted)}
+.trade{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;scroll-margin-top:16px}
+.trade.mine{border:2px solid var(--ink)}
+.trade.taking{border:2px solid var(--ok)}
+.trade.unavail{background:var(--sunk);border-style:dashed}
+.trade.taken{background:var(--sunk);border-color:var(--line)}
+.trade.taken .time,.trade.taken .person,.trade.taken .lvl,.trade.taken .note{opacity:.5}
+.trade.unavail .time,.trade.unavail .person,.trade.unavail .lvl{opacity:.6}
+.noway{font-size:13px;font-weight:600;color:var(--muted);display:flex;gap:6px;align-items:center}
+.yours{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:2px 8px;background:var(--ink);color:var(--surface)}
+.yours.taking{background:var(--ok);color:var(--surface)}
+.trade.flash{box-shadow:0 0 0 2px var(--yellow)}
+.trow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.time{font-family:var(--f-mono);font-size:19px;font-weight:600}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:2px 7px;border:1px solid transparent}
+.lvl.full{background:var(--full);color:#fff}
+.lvl.provisional{background:var(--prov);color:#fff}
+.person{display:inline-flex;align-items:center;gap:7px;font-weight:500;min-width:0}
+.av{width:22px;height:22px;border-radius:50%;flex:none;display:inline-grid;place-items:center;font-size:11px;font-weight:600;color:#fff}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.tag{font-size:12px;border-radius:4px;padding:2px 8px;font-weight:500;background:var(--sunk);color:var(--muted)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.y{background:var(--yellow-soft);color:var(--yellow-ink)}
+.note{font-size:14px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sub-block{display:flex;flex-direction:column;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.sub-block h4{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.offer{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+.offer .what{flex:1;min-width:180px}
+.offer .what small{display:block;color:var(--muted)}
+.form{display:flex;flex-direction:column;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex-wrap:wrap}
+.seg label{padding:6px 12px;cursor:pointer;font-size:14px;font-weight:500;display:flex;gap:6px;align-items:center}
+.seg input{accent-color:var(--charcoal)}
+.seg label:has(input:checked){background:var(--yellow-soft)}
+textarea,select,input[type=date],input[type=text],input[type=password],input[type=number]{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;max-width:100%}
+textarea{width:100%;min-height:60px;resize:vertical}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500}
+.check{display:flex;gap:8px;align-items:center;font-size:14px}
+.check input{accent-color:var(--charcoal);width:16px;height:16px}
+
+.sums{background:var(--sunk);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.step{padding:3px 8px;border-radius:4px;background:var(--surface);color:var(--muted)}
+.step.done{background:var(--ok-soft);color:var(--ok)}
+.step.now{background:var(--yellow);color:var(--on-yellow)}
+.sums code{font-family:var(--f-mono);font-size:13px;background:var(--surface);padding:8px 10px;border-radius:4px;display:block;overflow-wrap:anywhere;user-select:all}
+
+.match{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;padding:6px 0}
+.match .why{flex:1;min-width:160px;color:var(--muted);font-size:13px}
+.star{color:var(--yellow-ink);font-weight:600}
+
+/* per-trade discussion */
+.disc{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:8px}
+.disc-row{display:flex;gap:10px;align-items:center;min-width:0}
+.disc-toggle{display:inline-flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink);flex:none}
+.disc-toggle:hover{border-color:var(--muted);background:var(--sunk)}
+.disc-toggle[aria-expanded="true"]{background:var(--sunk)}
+.disc-toggle .new{background:var(--yellow);color:#262626;border-radius:4px;padding:0 6px;font-size:12px}
+.disc-row .last{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.tmsgs{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;background:var(--sunk);border-radius:6px;padding:10px}
+.tmsg{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.tmsg .body{min-width:0;flex:1}
+.tmsg .meta{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:baseline}
+.tmsg .meta b{color:var(--ink);font-size:13px}
+.tmsg .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.tmsg.ask .txt{border-left:3px solid var(--yellow);padding-left:8px}
+.tmsg .del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:12px;margin-left:auto}
+.tcomp{display:flex;gap:8px;align-items:flex-end}
+.tcomp textarea{min-height:40px}
+
+.empty{border:1px dashed var(--line);border-radius:8px;padding:28px 18px;text-align:center;color:var(--muted)}
+.empty h3{color:var(--ink);font-size:22px;margin-bottom:4px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.hrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hrow h2{font-size:24px}
+.saved{font-size:13px;color:var(--muted);margin-left:auto}
+.gridwrap{overflow-x:auto}
+.grid{display:grid;grid-template-columns:56px repeat(7,minmax(38px,1fr));user-select:none;-webkit-user-select:none;min-width:320px}
+.grid .dh{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:4px 0 6px;color:var(--muted)}
+.grid .dh.off{text-decoration:line-through;opacity:.6}
+.grid .tl{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:right;padding-right:6px;transform:translateY(-8px);height:28px}
+.cell{height:28px;border:0;border-left:1px solid var(--line);border-top:1px solid var(--line);background:var(--surface);padding:0;cursor:pointer;touch-action:pan-y;position:relative}
+.cell:hover{background:var(--yellow-soft)}
+.cell.on{background:var(--yellow)}
+.cell.on.top{box-shadow:inset 0 2px 0 var(--charcoal)}
+.cell.will{background:var(--ok-soft);box-shadow:inset 0 0 0 1px var(--ok)}
+.willmode .cell.on{background:var(--sunk);box-shadow:none;opacity:.7}
+.grid:not(.willmode) .cell.will:disabled{background:var(--ok-soft);box-shadow:inset 0 0 0 1px var(--ok);opacity:.6;cursor:not-allowed}
+.willmode .cell.on:disabled{background:repeating-linear-gradient(-45deg,var(--yellow-soft) 0 4px,var(--sunk) 4px 8px)}
+.callout{background:var(--yellow-soft);border-radius:6px;padding:10px 12px;font-size:14px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.sw-shift{background:var(--yellow)}
+.sw-will{background:var(--ok-soft);box-shadow:inset 0 0 0 1px var(--ok)}
+.cell:disabled{cursor:not-allowed;background:repeating-linear-gradient(-45deg,var(--sunk) 0 4px,var(--surface) 4px 8px)}
+.blocks{display:flex;gap:6px;flex-wrap:wrap}
+.blk{display:inline-flex;align-items:center;gap:6px;background:var(--sunk);border-radius:6px;padding:4px 4px 4px 10px;font-size:13px}
+.blk button{border:0;background:none;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:4px}
+.blk button:hover{background:var(--surface);color:var(--warn)}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+.heat .cell .k{font-family:var(--f-mono);font-size:11px;position:absolute;inset:0;display:grid;place-items:center;color:var(--on-yellow)}
+.heat .cell.sel{outline:2px solid var(--ink);outline-offset:-2px}
+.legend{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.legend i{width:18px;height:12px;display:inline-block;border-radius:2px}
+.rlist{display:flex;flex-direction:column;gap:6px;font-size:14px}
+
+.days7{display:flex;gap:6px;flex-wrap:wrap}
+.days7 label{border:1px solid var(--line);border-radius:6px;padding:6px 10px;display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:500}
+.days7 label:has(input:checked){background:var(--yellow-soft);border-color:var(--yellow)}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.closure{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}
+.lock{max-width:440px;display:flex;flex-direction:column;gap:12px}
+.custom{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding-top:10px}
+
+.scrim{position:fixed;inset:0;background:rgba(20,20,20,.55);display:grid;place-items:end center;z-index:20;padding-top:env(safe-area-inset-top,0px)}
+.sheet{background:var(--surface);width:min(640px,100%);max-height:92%;overflow:auto;border-radius:12px 12px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+@media (min-width:640px){.scrim{place-items:center}.sheet{border-radius:12px}}
+.sheet h2{font-size:26px}
+.occs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px}
+.occ{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column}
+.occ b{font-weight:600;font-size:14px}
+.occ span{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.occ[aria-pressed="true"]{border-color:var(--ink);background:var(--yellow-soft)}
+.occ:disabled{opacity:.45;cursor:not-allowed}
+details summary{cursor:pointer;font-weight:600;font-size:14px}
+.occdays{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto}
+.occday{display:flex;flex-direction:column;gap:6px}
+.occday b{font-size:14px}
+.hours{display:flex;gap:6px;flex-wrap:wrap}
+.hourb{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 10px;cursor:pointer;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.hourb[aria-pressed="true"]{border-color:var(--ink);background:var(--yellow-soft);font-weight:700}
+.hourb:disabled{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.pick{background:var(--sunk);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:12px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--charcoal);color:#F4F4F2;padding:10px 16px;border-radius:8px;font-size:14px;z-index:30;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+@media (prefers-reduced-motion:no-preference){.trade{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(3px)}to{transform:none}}}
+@media (max-width:520px){.brand h1{font-size:24px}.who{margin-left:0;width:100%}.topline .btn{margin-left:0;width:100%}.tags{margin-left:0}}
+</style>
+
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">IS</div>
+      <div><h1>Shift Board</h1><span class="sub">Invention Studio · PI board</span></div>
+      <div class="who" id="who"></div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+  <div class="stripe" aria-hidden="true"></div>
+</header>
+<main><div class="wrap" id="view"><div class="empty"><h3>Loading the board</h3><p>Open trades, your hours and the studio roster will appear here.</p></div></div></main>
+<div id="modal"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+/* =====================================================================
+   SUPABASE CONNECTION
+   Paste these from Supabase → Project Settings → API (or the "Connect" button):
+     SUPABASE_URL  the Project URL, like https://abcdefghij.supabase.co
+     SUPABASE_KEY  the "anon public" (or "publishable") key. It's meant to be public;
+                   the security rules in supabase-setup.sql protect the data.
+   Leave them empty to see the board with example data only.
+   ===================================================================== */
+const SUPABASE_URL = "";
+const SUPABASE_KEY = "";
+
+/* ---------- constants ---------- */
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DAYS_LONG = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const SLOT = 60;
+const DEFAULT_CFG = { days:[true,true,true,true,true,false,false], open:9, close:23, fullTakesProv:false, urgentHours:48, lookahead:21, closures:[], announcement:"" };
+
+/* ---------- state ---------- */
+const S = { mode:"loading", backend:null, me:null, canWrite:true, pis:{}, trades:{}, offers:{}, msgs:{}, config:null, mine:{seen:{}}, db:null, user:null, demoMsg:"", loaded:{} };
+const ui = { tab:"board", filter:"all", day:null, offering:null, finder:null, threads:new Set(), draft:{}, tdraft:{}, modal:null, confirm:null, rosterCell:null,
+  slots:null, dirty:false, saveState:"", flash:null, admin:false, adminDraft:null, editing:null, saveFor:null };
+
+/* ---------- utils ---------- */
+const cfg = () => ({...DEFAULT_CFG, ...(S.config||{})});
+const pad = n => String(n).padStart(2,"0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const wd = d => (d.getDay()+6)%7;
+const nowMin = () => { const d = new Date(); return d.getHours()*60+d.getMinutes(); };
+const pm = m => (m%1440) >= 720;
+function tm(m, suffix=true){ const h=Math.floor(m/60)%24, mm=m%60; return (h%12||12)+(mm?":"+pad(mm):"")+(suffix?(pm(m)?" PM":" AM"):""); }
+function range(s,e){ return pm(s)===pm(e) ? `${tm(s,false)}–${tm(e)}` : `${tm(s)}–${tm(e)}`; }
+function dayLabel(ds){ const d=parse(ds); return `${DAYS[wd(d)]} ${MONTHS[d.getMonth()]} ${d.getDate()}`; }
+function daysAway(ds){ return Math.round((parse(ds)-today())/864e5); }
+function rel(ds){ const n=daysAway(ds); return n===0?"Today":n===1?"Tomorrow":n<0?`${-n} days ago`:`in ${n} days`; }
+function ago(s){ if(!s) return ""; const h=(Date.now()-new Date(s))/36e5; return h<1/60?"just now":h<1?`${Math.floor(h*60)}m ago`:h<24?`${Math.floor(h)}h ago`:`${Math.floor(h/24)}d ago`; }
+function when(s){ const d=new Date(s), t=tm(d.getHours()*60+d.getMinutes()); return iso(d)===iso(today()) ? t : `${MONTHS[d.getMonth()]} ${d.getDate()}, ${t}`; }
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const hoursUntil = t => (parse(t.date).getTime() + t.s*60000 - Date.now())/36e5;
+const hasStarted = t => { const n=daysAway(t.date); return n<0 || (n===0 && t.s<=nowMin()); };
+const lvlName = l => l==="full" ? "Full" : "Provisional";
+const nowIso = () => new Date().toISOString();
+function deepMerge(a,b){ for(const k in b){ if(b[k] && typeof b[k]==="object" && !Array.isArray(b[k]) && a[k] && typeof a[k]==="object") deepMerge(a[k],b[k]); else a[k]=b[k]; } return a; }
+function isClosed(ds){ const c=cfg(); return !c.days[wd(parse(ds))] || (c.closures||[]).some(x=>ds>=x.from && ds<=x.to); }
+function closureLabel(ds){ const x=(cfg().closures||[]).find(x=>ds>=x.from && ds<=x.to); return x ? (x.label||"Closed") : (!cfg().days[wd(parse(ds))] ? "Closed" : ""); }
+const hourOpts = (sel, from, to) => { let o=""; for(let h=from; h<=to; h++) o+=`<option value="${h}" ${+sel===h?"selected":""}>${tm(h*60)}</option>`; return o; };
+
+const myPI = () => S.pis[S.me] || null;
+/* why the viewer can't take an open trade, or null if they can */
+function blockedReason(t){
+  if(t.by===S.me) return null;
+  const lvl=myLevel();
+  if(!lvl) return "Set your shift type under Me";
+  if(!canTakeLevel(lvl,t.level)) return `${lvlName(t.level)} PIs only`;
+  if(worksThen(S.me,t.date,t.s,t.e)) return "You're already working then";
+  return null;
+}
+/* John Overend (JCO) always gets the Admin tab. On the live site it still asks him to sign in. */
+const isJCO = () => /^(jco|john\s+(c\.?\s+)?overend)$/i.test((myPI()?.name||"").trim());
+const myLevel = () => myPI()?.level || null;
+const canTakeLevel = (mine, shift) => mine===shift || (cfg().fullTakesProv && mine==="full" && shift==="provisional");
+function willingThen(uid, date, s, e){ const d=wd(parse(date)); const w=S.pis[uid]?.willing||[]; for(let m=s;m<e;m+=SLOT){ if(!w.some(b=>b.d===d && b.s<=m && m<b.e)) return false; } return w.length>0; }
+function worksThen(uid, date, s, e){ const d=wd(parse(date)); return (S.pis[uid]?.blocks||[]).some(b => b.d===d && b.s<e && s<b.e); }
+function occurrences(uid){
+  const out=[], blocks=S.pis[uid]?.blocks||[], t0=today(), c=cfg();
+  for(let k=0;k<c.lookahead;k++){ const d=addDays(t0,k), ds=iso(d), w=wd(d);
+    if(isClosed(ds)) continue;
+    for(const b of blocks) if(b.d===w) for(let h=b.s; h<b.e; h+=SLOT) if(!(k===0 && h<=nowMin())) out.push({date:ds, s:h, e:h+SLOT}); }
+  return out.sort((a,b)=>a.date.localeCompare(b.date)||a.s-b.s);
+}
+const offersFor = tid => Object.entries(S.offers).filter(([,o])=>o.trade===tid).sort((a,b)=>(a[1].created||"").localeCompare(b[1].created||""));
+const threadFor = tid => Object.entries(S.msgs).filter(([,m])=>m.ch==="t:"+tid).sort((a,b)=>a[1].created.localeCompare(b[1].created));
+const activeTrades = () => Object.entries(S.trades).filter(([,t])=>t.status!=="cancelled" && !hasStarted(t));
+const involvedIn = (id,t) => t.by===S.me || t.takerId===S.me || offersFor(id).some(([,o])=>o.by===S.me && o.status!=="withdrawn") || threadFor(id).some(([,m])=>m.by===S.me || m.to===S.me);
+const unreadThread = id => { const seen=S.mine.seen?.["t:"+id]||""; return threadFor(id).filter(([,m])=>m.by!==S.me && m.created>seen).length; };
+
+/* ---------- people ---------- */
+const DEMO = { "demo-you":"You" };
+const PALETTE=["#8A5A9E","#2F7D8C","#B5652C","#4C7A34","#B3405A","#5462A8","#7A6A2E","#3C7F6B","#9B4F7A","#5B6E7F"];
+function colorFor(id){ let h=0; for(const c of String(id)) h=(h*31+c.charCodeAt(0))>>>0; return PALETTE[h%PALETTE.length]; }
+function knownIds(){
+  const s=new Set(Object.keys(S.pis));
+  for(const t of Object.values(S.trades)){ s.add(t.by); if(t.takerId) s.add(t.takerId); }
+  for(const o of Object.values(S.offers)) s.add(o.by);
+  for(const m of Object.values(S.msgs)){ s.add(m.by); if(m.to) s.add(m.to); }
+  if(S.me) s.add(S.me); s.delete(undefined); s.delete(null);
+  return [...s];
+}
+async function people(ids, real=false){
+  const out={}; let ps={};
+  if(S.backend==="claude" && S.user && ids.length) ps = await S.user.profiles(ids);
+  for(const id of ids){
+    const pn=S.pis[id]?.name, p=ps[id];
+    let name = pn || p?.name || DEMO[id] || (id===S.me?"Me":"A PI");
+    if(id===S.me && !real) name="You";
+    out[id]={ name, color: pn ? colorFor(id) : (p?.color || colorFor(id)) };
+  }
+  return out;
+}
+const initials = n => n==="You" ? "Y" : n.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+const av = (P,id) => `<span class="av" style="background:${esc(P[id]?.color)}">${esc(initials(P[id]?.name||"?"))}</span>`;
+const who = (P,id) => `<span class="person">${av(P,id)}${esc(P[id]?.name||"A PI")}</span>`;
+const nm = (P,id) => esc(P[id]?.name || "A PI");
+const hasExamples = () => ["pis","trades","offers","msgs"].some(c=>Object.values(S[c]).some(x=>x.example));
+
+/* things that need this person: shown at the top of the board and as the tab badge */
+function forYou(){
+  const items=[], me=S.me;
+  for(const [id,t] of activeTrades()){
+    const label=`${dayLabel(t.date)} ${range(t.s,t.e)}`;
+    if(t.status==="open" && t.by===me){ const n=offersFor(id).filter(([,o])=>o.status==="pending").length; if(n) items.push({id, text:`${n} offer${n>1?"s":""} on your ${label} shift`, act:"Offers"}); }
+    if(t.status==="agreed" && (t.by===me||t.takerId===me) && !(t.sumsBy||{})[me]) items.push({id, text:`Enter ${label} in SUMS, then confirm`, act:"Open"});
+    const asks=threadFor(id).filter(([,m])=>m.kind==="ask" && m.to===me && t.status==="open" && !offersFor(id).some(([,o])=>o.by===me));
+    if(asks.length) items.push({id, ask:asks[asks.length-1][1].by, text:`asked if you can take ${label}`, act:"View"});
+    const u=unreadThread(id); if(u && involvedIn(id,t) && !asks.length) items.push({id, text:`${u} new message${u>1?"s":""} on ${label}`, act:"Read", thread:true});
+  }
+  return items;
+}
+
+/* ---------- writes ---------- */
+function toast(msg, ms=3200){ const el=document.getElementById("toast"); el.textContent=msg; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true, ms); }
+function writeError(e){
+  const c=e?.code;
+  if(S.backend==="supa"){
+    if(c==="42501") toast("You don't have permission to do that.",5000);
+    else if(c==="P0001" && e.message) toast(e.message,5000);
+    else toast("Couldn't save. Check your connection and try again.");
+    return;
+  }
+  if(c==="invalid_argument" || c==="permission-denied"){ S.canWrite=false; toast("This board is view-only for you right now. Ask an admin for access.",5000); render(true); }
+  else if(c==="quota_exceeded" || c==="resource-exhausted") toast("The board's storage is full or busy. Try again shortly.",5000);
+  else toast("Couldn't save. Check your connection and try again.");
+}
+/* Storage layout (kept small so each page open costs only a few reads):
+   board/roster   one document holding every PI:  { pis: { <id>: {name, level, blocks, owner} } }
+   trades/<id>    one document per trade, with its offers and discussion inside:
+                  { by, level, date, s, e, status, …, offers: { <id>: {...} }, msgs: { <id>: {...} } }
+   config/studio  studio settings (admins only)
+   The page unpacks these into S.pis, S.trades, S.offers and S.msgs, so the rest of the code
+   works with simple lists; write() and remove() pack changes back into the right document. */
+const DEL = Object.freeze({__delete:true});
+function isPlain(v){ return v && typeof v==="object" && !Array.isArray(v) && Object.getPrototypeOf(v)===Object.prototype; }
+function nullDeep(v){ if(v===DEL) return null; if(isPlain(v)){ const o={}; for(const k in v) o[k]=nullDeep(v[k]); return o; } return v; }
+async function patchDoc(col,id,nested){
+  const ref=S.db.collection(col).doc(id);
+  if(col==="board" && !S.rosterExists){ await ref.set(nullDeep(nested)); S.rosterExists=true; }
+  else await ref.update(nullDeep(nested));
+}
+/* ---------- Supabase storage: one row per item, fields kept in a JSON "data" column ---------- */
+function localApply(col,id,data,trade){
+  if(col==="config"){ if(id==="studio") S.config=data; return; }
+  if(col==="offers") S.offers[id]={...data, trade};
+  else if(col==="msgs") S.msgs[id]={...data, trade, ch:"t:"+trade};
+  else S[col][id]=data;
+}
+function localRemove(col,id){
+  delete S[col][id];
+  if(col==="trades"){
+    for(const [k,o] of Object.entries(S.offers)) if(o.trade===id) delete S.offers[k];
+    for(const [k,m] of Object.entries(S.msgs)) if(m.trade===id) delete S.msgs[k];
+  }
+}
+async function supaWrite(col,id,data,merge){
+  try{
+    const sub = col==="offers" || col==="msgs";
+    let trade, body=structuredClone(data);
+    if(sub){
+      trade = data.trade || S[col][id]?.trade;
+      if(!trade || !S.trades[trade]){ toast("That trade isn't on the board anymore."); return false; }
+      delete body.trade; delete body.ch;
+    }
+    const before = col==="config" ? (S.config||{}) : (S[col][id]||{});
+    const res = merge
+      ? await S.sb.rpc("patch_row", {tbl:col, rid:id, patch:body})
+      : await S.sb.from(col).upsert(sub ? {id, trade, data:body} : {id, data:body});
+    if(res.error) throw res.error;
+    localApply(col, id, merge ? deepMerge(structuredClone(before), body) : body, trade);
+    render(); return true;
+  }catch(e){ writeError(e); return false; }
+}
+async function supaRemove(col,id){
+  const key = col==="admins" ? "uid" : "id";
+  const { error } = await S.sb.from(col).delete().eq(key, id);
+  if(error){ writeError(error); return false; }
+  if(col!=="admins") localRemove(col,id);
+  render(); return true;
+}
+async function write(col,id,data,merge=false){
+  if(S.backend==="supa" && S.mode==="live") return supaWrite(col,id,data,merge);
+  if(S.mode!=="live"){
+    if(col==="config") S.config = merge ? deepMerge(structuredClone(S.config||{}),data) : structuredClone(data);
+    else S[col][id] = merge ? deepMerge(structuredClone(S[col][id]||{}), data) : structuredClone(data);
+    render(); return true;
+  }
+  try{
+    if(col==="config"){ const ref=S.db.collection("config").doc(id); merge ? await ref.update(data) : await ref.set(data); }
+    else if(col==="trades" && !merge) await S.db.collection("trades").doc(id).set({...data, offers:{}, msgs:{}});
+    else if(col==="trades") await patchDoc("trades", id, data);
+    else if(col==="pis") await patchDoc("board", "roster", {pis:{[id]:data}});
+    else if(col==="offers" || col==="msgs"){
+      const tid = data.trade || S[col][id]?.trade;
+      if(!tid || !S.trades[tid]){ toast("That trade isn't on the board anymore."); return false; }
+      const body={...data}; delete body.trade; delete body.ch;
+      await patchDoc("trades", tid, {[col]:{[id]:body}});
+    }
+    return true;
+  }catch(e){ writeError(e); return false; }
+}
+async function remove(col,id){
+  if(S.backend==="supa" && S.mode==="live"){ await supaRemove(col,id); return; }
+  if(S.mode!=="live"){ delete S[col][id]; render(); return; }
+  try{
+    if(col==="trades") await S.db.collection("trades").doc(id).delete();
+    else if(col==="pis") await patchDoc("board","roster",{pis:{[id]:DEL}});
+    else if(col==="offers" || col==="msgs"){ const tid=S[col][id]?.trade; if(tid && S.trades[tid]) await patchDoc("trades",tid,{[col]:{[id]:DEL}}); }
+  }catch(e){ if(col==="pis") writeError(e); }
+}
+let mineT=null;
+function saveMineSoon(){
+  clearTimeout(mineT);
+  mineT=setTimeout(async()=>{
+    if(S.backend==="supa"){ try{ localStorage.setItem("st-seen-"+S.me, JSON.stringify(S.mine)); }catch(e){} return; }
+    if(S.mode==="live" && S.canWrite && S.me && S.me!=="__nobody__"){ try{ await S.db.doc(`data/users/${S.me}/state`).set(structuredClone(S.mine)); }catch(e){} }
+  }, 1200);
+}
+async function postMsg(tid, text, extra={}){
+  text=(text||"").trim(); if(!text) return false;
+  return write("msgs", newId(), { ch:"t:"+tid, trade:tid, by:S.me, text:text.slice(0,1000), created:nowIso(), ...extra });
+}
+function markThreadSeen(tid){
+  const l=threadFor(tid); if(!l.length) return;
+  const at=l[l.length-1][1].created;
+  if(at > (S.mine.seen?.["t:"+tid]||"")){ S.mine.seen={...(S.mine.seen||{}), ["t:"+tid]:at}; saveMineSoon(); }
+}
+
+/* trades disappear once their start time passes; their offers and discussion go with them */
+let purging=false;
+async function purgePast(){
+  if(purging || S.mode!=="live" || !S.canWrite || !S.loaded.trades) return;
+  purging=true;
+  try{ for(const [id,t] of Object.entries(S.trades)) if(hasStarted(t) || t.status==="cancelled") await remove("trades",id); }
+  finally { purging=false; }
+}
+
+/* ---------- render ---------- */
+let rv=0, pending=false;
+/* Live updates redraw the page. Hold off only while someone is actively typing,
+   then redraw and put their cursor back where it was. */
+let lastInput=0;
+document.addEventListener("input", ()=>{ lastInput=Date.now(); }, true);
+function typing(){ const a=document.activeElement; return a && a.closest && a.closest("#view") && /^(INPUT|TEXTAREA)$/.test(a.tagName) && Date.now()-lastInput<2500; }
+function fieldKey(el){ if(!el || !el.closest || !el.closest("#view")) return null; if(el.id) return "#"+CSS.escape(el.id); for(const a of ["data-adm","data-draft","data-tc"]) if(el.hasAttribute(a)) return `[${a}="${CSS.escape(el.getAttribute(a))}"]${el.dataset.k?`[data-k="${CSS.escape(el.dataset.k)}"]`:""}`; return null; }
+async function render(force){
+  if(!force && typing()){ if(!pending){ pending=true; setTimeout(()=>{ if(pending) render(); }, 2600); } return; }
+  pending=false; const v=++rv;
+  renderTabs();
+  if(S.mode==="loading") return;
+  if(S.mode!=="loading" && ui.tab!=="admin"){
+    if(S.mode==="live" && !S.loaded.pis){ document.getElementById("view").innerHTML=`<div class="empty"><h3>Loading the board</h3></div>`; return; }
+    const needs = S.canWrite && (S.backend==="supa" ? (!S.me || !S.pis[S.me]) : !S.pis[S.me]);
+    if(needs){ document.getElementById("view").innerHTML = setupView(); renderWho(); return; }
+  }
+  const P = await people(knownIds());
+  if(v!==rv) return;
+  let html;
+  if(ui.tab==="board") html = boardView(P);
+  else if(ui.tab==="hours") html = hoursView(P);
+  else html = adminView(P);
+  const view=document.getElementById("view");
+  const scrolls={}; view.querySelectorAll(".tmsgs").forEach(el=>{ scrolls[el.id]=el.scrollHeight-el.scrollTop-el.clientHeight<40; });
+  const act=document.activeElement, key=fieldKey(act), saved = key && /^(INPUT|TEXTAREA|SELECT)$/.test(act.tagName) ? {v:act.value, a:act.selectionStart, b:act.selectionEnd} : null;
+  view.innerHTML = bannerHTML() + html;
+  if(saved){ const el=view.querySelector(key); if(el){ if(saved.v && el.value!==saved.v && el.tagName!=="SELECT") el.value=saved.v; el.focus({preventScroll:true}); try{ if(saved.a!=null) el.setSelectionRange(saved.a, saved.b); }catch(e){} } }
+  view.querySelectorAll(".tmsgs").forEach(el=>{ if(scrolls[el.id]!==false) el.scrollTop=el.scrollHeight; });
+  for(const tid of ui.threads) if(document.visibilityState==="visible") markThreadSeen(tid);
+  renderTabs(); renderWho();
+  if(ui.flash){ const el=document.getElementById("tr-"+ui.flash); if(el){ el.classList.add("flash"); el.scrollIntoView({block:"center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); } ui.flash=null; }
+}
+document.addEventListener("focusout", ()=>{ if(pending) setTimeout(()=>{ if(pending && !typing()) render(); }, 350); });
+setInterval(()=>{ render(); purgePast(); }, 60000);
+
+function renderTabs(){
+  const n = S.mode==="loading" ? 0 : forYou().length;
+  const tabs=[["board","Trade board",n],["hours","Me",0]]; if(ui.admin || isJCO()) tabs.push(["admin","Admin",0]);
+  document.getElementById("tabs").innerHTML = tabs.map(([k,l,c])=>`<button class="tab" role="tab" aria-selected="${ui.tab===k}" data-act="tab" data-v="${k}">${l}${c?`<span class="count" aria-label="${c} need you">${c}</span>`:""}</button>`).join("");
+}
+function renderWho(){
+  const el=document.getElementById("who"), lvl=myLevel();
+  if(S.mode==="loading"){ el.innerHTML=""; return; }
+  const name = S.backend==="supa" && S.pis[S.me]?.name ? `<b>${esc(S.pis[S.me].name)}</b>` : "";
+  el.innerHTML = (name?`${name}`:"") + (lvl?` <span class="lvl ${lvl}">${lvlName(lvl)}</span>`:"") + (S.backend==="supa" && S.me ? ` <button data-act="switch-user">Not you?</button>` : "");
+}
+function bannerHTML(){
+  let b="";
+  if(S.mode==="demo") b+=`<div class="banner example"><b>Example data.</b> ${esc(S.demoMsg)} Everything works here, but nothing is shared or saved.</div>`;
+  else if(!S.canWrite) b+=`<div class="banner"><b>View-only.</b> You can read the board but can't post, offer or comment. Ask an admin for access.</div>`;
+  if(S.mode==="live" && hasExamples() && ui.tab==="board") b+=`<div class="banner example"><span><b>Example PIs loaded.</b> The roster and trades include made-up people so you can see how the board works. Remove them from Admin before going live.</span></div>`;
+  if(cfg().announcement && ui.tab==="board") b+=`<div class="banner ann"><b>Announcement</b> <span>${esc(cfg().announcement)}</span></div>`;
+  if(S.mode!=="demo" && S.canWrite && myPI() && !(myPI().blocks||[]).length && ui.tab!=="hours" && ui.tab!=="admin") b+=`<div class="banner"><span><b>Add your weekly hours.</b> The board uses them to show which trades you're free for and who could cover yours.</span><button class="btn primary" data-act="tab" data-v="hours">Set my hours</button></div>`;
+  return b;
+}
+
+/* ----- first-time setup ----- */
+function setupView(){
+  const fb=S.backend==="supa";
+  const unclaimed = fb ? Object.keys(S.pis).filter(id=>!S.pis[id].owner && !S.pis[id].example).sort((a,b)=>(S.pis[a].name||"").localeCompare(S.pis[b].name||"")) : [];
+  const d = ui.setup ||= {name:S.profileName||"", level:""};
+  return `<div class="panel lock" style="max-width:560px">
+    <h2>Welcome to Shift Board</h2>
+    <p class="hint">First time here? Tell us who you are. You can change this anytime under Me.</p>
+    <label class="field">Your name<input type="text" id="su-name" maxlength="60" placeholder="First Last" value="${esc(d.name)}" autocomplete="name"></label>
+    <div class="field">Shift type<div class="seg" role="radiogroup" aria-label="Shift type">
+      <label><input type="radio" name="su-lvl" value="full" ${d.level==="full"?"checked":""}>Full PI</label>
+      <label><input type="radio" name="su-lvl" value="provisional" ${d.level==="provisional"?"checked":""}>Provisional PI</label></div></div>
+    <div class="acts"><button class="btn primary" data-act="setup-done">Continue</button></div>
+    ${unclaimed.length?`<details><summary>An admin already added me</summary>
+      <div class="custom"><select id="id-pick" aria-label="Your name"><option value="">Choose your name…</option>${unclaimed.map(id=>`<option value="${esc(id)}">${esc(S.pis[id].name||"Unnamed PI")}</option>`).join("")}</select>
+      <button class="btn" data-act="id-pick">That's me</button></div></details>`:""}
+    ${fb?`<p class="hint">The board remembers you on this device.</p>`:""}
+  </div>`;
+}
+
+/* ----- admins ----- */
+function currentAdminId(){ return S.backend==="supa" ? S.uid : S.backend==="claude" ? "owner" : "a-john"; }
+function adminsHTML(){
+  const rows=Object.entries(S.admins||{}).sort((a,b)=>(a[1].name||"").localeCompare(b[1].name||""));
+  const me=currentAdminId(), canAdd = S.backend!=="claude";
+  return `<div class="panel">
+    <div class="hrow"><h2>Admins</h2><span class="muted" style="font-size:13px">${rows.length}</span></div>
+    <p class="hint">Admins can change studio settings, edit anyone's hours and take people off the roster. The Admin tab only appears for them${S.backend==="supa"?"; they sign in at this page's address with <span class=\"mono\">#admin</span> on the end":""}.</p>
+    ${rows.map(([id,a])=>`<div class="closure"><span class="person">${av({[id]:{name:a.name||"Admin",color:colorFor(id)}},id)}${esc(a.name||"Admin")}</span><span class="muted" style="flex:1">${esc(a.email||"")}${id===me?" · you":""}</span>${canAdd && id!==me?`<button class="btn sm ghost danger" data-act="rm-admin" data-v="${esc(id)}">${ui.confirm==="ad"+id?"Click again":"Remove"}</button>`:""}</div>`).join("")}
+    ${canAdd?`<div class="custom">
+      <label class="field">Name<input type="text" id="na-name" maxlength="60" placeholder="First Last"></label>
+      <label class="field">Email<input type="text" id="na-email" inputmode="email" autocomplete="off"></label>
+      <label class="field">Temporary password<input type="text" id="na-pw" autocomplete="off" placeholder="8+ characters"></label>
+      <button class="btn" data-act="add-admin">Add admin</button></div>
+      <p class="hint">Give them the email and temporary password in person. They sign in at <span class="mono">#admin</span>.</p>`
+    : `<p class="hint">On claude.ai the board's owner is the admin. On your website you can add more admins here.</p>`}
+  </div>`;
+}
+
+/* ----- board ----- */
+function boardView(P){
+  const me=S.me, lvl=myLevel();
+  const live = activeTrades();
+  const takeable = ([,t]) => t.status==="open" && t.by!==me && !blockedReason(t);
+  const open = live.filter(([,t])=>t.status==="open");
+  const counts = { all: live.filter(([id,t])=>t.status!=="done"||involvedIn(id,t)).length, take: live.filter(takeable).length,
+    full: open.filter(([,t])=>t.level==="full").length, provisional: open.filter(([,t])=>t.level==="provisional").length,
+    mine: live.filter(([id,t])=>involvedIn(id,t)).length };
+  let list = live.filter(([id,t]) => {
+    if(ui.filter==="take") return takeable([id,t]);
+    if(ui.filter==="mine") return involvedIn(id,t);
+    if(ui.filter==="full"||ui.filter==="provisional") return t.status==="open" && t.level===ui.filter;
+    return t.status!=="done" || involvedIn(id,t);
+  });
+  if(ui.day) list = list.filter(([,t])=>t.date===ui.day);
+  list.sort((a,b)=>a[1].date.localeCompare(b[1].date)||a[1].s-b[1].s);
+
+  const t0=today(); let strip="";
+  for(let k=0;k<14;k++){ const d=addDays(t0,k), ds=iso(d), w=wd(d), closed=isClosed(ds);
+    const here = open.filter(([,t])=>t.date===ds);
+    const pips = closed ? "Closed" : here.slice(0,4).map(([,t])=>`<span class="pip ${t.level} ${t.by===me?"mine":""}"></span>`).join("") + (here.length>4?`<span class="mono">+${here.length-4}</span>`:"");
+    strip += `<button class="dayb ${closed?"closed":""}" data-act="day" data-v="${ds}" aria-pressed="${ui.day===ds}" aria-label="${dayLabel(ds)}, ${closed?esc(closureLabel(ds)):here.length+" open"}" title="${esc(closed?closureLabel(ds):"")}"><span class="w">${k===0?"Today":DAYS[w]}</span><span class="n">${d.getDate()}</span><span class="c">${pips}</span></button>`;
+  }
+  const chip = (k,l) => `<button class="chip" data-act="filter" data-v="${k}" aria-pressed="${ui.filter===k}">${l}<span class="k">${counts[k]}</span></button>`;
+  const fy = forYou();
+  const fyHTML = fy.length ? `<section class="foryou" aria-label="Needs you"><h3>Needs you</h3>${fy.map(x=>`<div class="fy">${x.ask?av(P,x.ask):""}<span class="fytext">${x.ask?`<b>${nm(P,x.ask)}</b> `:""}${esc(x.text)}</span><button class="btn sm" data-act="goto" data-v="${x.id}" data-thread="${x.thread||x.ask?1:0}">${x.act}</button></div>`).join("")}</section>` : "";
+
+  let body="";
+  if(!list.length){
+    body = live.length===0
+      ? `<div class="empty"><h3>No trades posted</h3><p>When a PI needs a shift covered, it shows up here. Need one yourself? Use <b>Request a trade</b>.</p></div>`
+      : `<div class="empty"><h3>Nothing matches</h3><p>Try another filter${ui.day?" or clear the day":""}.</p></div>`;
+  } else {
+    const groups={}; list.forEach(x=>(groups[x[1].date]??=[]).push(x));
+    for(const [ds,items] of Object.entries(groups))
+      body += `<section class="group"><div class="ghead"><h3>${dayLabel(ds)}</h3><span>${rel(ds)}</span></div>${items.map(([id,t])=>tradeCard(id,t,P)).join("")}</section>`;
+  }
+  return `
+  <div class="topline">
+    <div><h2>Open shifts</h2>
+      <div class="stats"><span><b>${open.length}</b> open</span><span><b>${counts.take}</b> available to you</span></div></div>
+    <button class="btn primary" data-act="open-request" ${!S.canWrite?"disabled":""}>Request a trade</button>
+  </div>
+  ${fyHTML}
+  <div class="strip" role="group" aria-label="Next two weeks">${strip}</div>
+  <div class="chips" role="group" aria-label="Filter">${chip("all","All")}${chip("take","Available")}${chip("full","Full")}${chip("provisional","Provisional")}${chip("mine","Mine")}${ui.day?`<button class="chip" data-act="day" data-v="${ui.day}">${dayLabel(ui.day)} ✕</button>`:""}</div>
+  ${body}
+  <p class="hint">Trades come off the board automatically once their start time passes.</p>`;
+}
+
+function tradeCard(id,t,P){
+  const me=S.me, mine=t.by===me, lvl=myLevel(), offers=offersFor(id), W=S.canWrite;
+  const pendingOffers = offers.filter(([,o])=>o.status==="pending");
+  const tags=[];
+  if(t.status==="open" && hoursUntil(t)<cfg().urgentHours) tags.push(`<span class="tag warn">Urgent · ${Math.max(1,Math.round(hoursUntil(t)))}h</span>`);
+  const blocked = t.status==="open" && !mine ? blockedReason(t) : null;
+  if(t.status==="open" && !mine && !blocked) tags.push(willingThen(me,t.date,t.s,t.e) ? `<span class="tag ok">Matches your availability</span>` : `<span class="tag ok">Available to you</span>`);
+  if(t.status==="open" && pendingOffers.length) tags.push(`<span class="tag y">${pendingOffers.length} offer${pendingOffers.length>1?"s":""}</span>`);
+  if(t.status==="agreed") tags.push((mine||t.takerId===me) ? `<span class="tag y">Agreed · SUMS pending</span>` : `<span class="tag">Taken</span>`);
+  if(t.status==="done") tags.push(`<span class="tag ok">In SUMS</span>`);
+  const wants = (t.wants||[]).filter(w=>daysAway(w.date)>=0);
+  const wantsLine = wants.length ? `<div class="trow" style="font-size:13px"><span class="muted">Prefers in return:</span>${wants.map(w=>`<span class="tag">${dayLabel(w.date)} ${range(w.s,w.e)}</span>`).join("")}</div>` : "";
+
+  let acts="";
+  if(t.status==="open" && mine){
+    if(pendingOffers.length) acts += `<div class="sub-block"><h4>Offers on your shift</h4>${pendingOffers.map(([oid,o])=>`<div class="offer"><div class="what">${who(P,o.by)} ${o.kind==="swap"?`wants to swap for <b class="mono">${dayLabel(o.swapDate)} ${range(o.swapS,o.swapE)}</b>`:"will cover it"}${o.note?`<small>“${esc(o.note)}”</small>`:""}</div>${W?`<button class="btn primary" data-act="accept" data-v="${oid}">Accept</button>`:""}</div>`).join("")}</div>`;
+    if(ui.finder===id) acts += finderHTML(id,t,P);
+    if(W) acts += `<div class="acts">
+      <button class="btn ${pendingOffers.length?"":"dark"}" data-act="finder" data-v="${id}">${ui.finder===id?"Hide":"Find cover"}</button>
+      <button class="btn ghost danger" data-act="cancel" data-v="${id}">${ui.confirm==="c"+id?"Confirm remove":"Remove"}</button></div>`;
+  } else if(t.status==="open"){
+    const myOffer = offers.find(([,o])=>o.by===me && o.status==="pending");
+    if(blocked) acts = `<div class="noway"><span aria-hidden="true">⊘</span> Not available to you: ${esc(blocked)}</div>`;
+    else if(myOffer) acts = `<div class="acts"><span class="hint">You offered to ${myOffer[1].kind==="swap"?`swap for ${dayLabel(myOffer[1].swapDate)} ${range(myOffer[1].swapS,myOffer[1].swapE)}`:"cover it"}. Waiting on ${nm(P,t.by)}.</span>${W?`<button class="btn ghost" data-act="withdraw" data-v="${myOffer[0]}">Cancel offer</button>`:""}</div>`;
+    else if(W && ui.offering===id) acts = offerForm(id,t);
+    else if(W) acts = `<div class="acts"><button class="btn dark" data-act="offer-open" data-v="${id}">Take shift</button></div>`;
+  } else {
+    const o = S.offers[t.acceptedOffer], involved = mine || t.takerId===me;
+    if(involved){
+      const sb=t.sumsBy||{}, other = mine?t.takerId:t.by, done = t.status==="done";
+      acts = `<div class="sums">
+        <div class="steps"><span class="step done">1 · Agreed</span><span class="step ${done?"done":"now"}">2 · Enter in SUMS</span><span class="step ${done?"done":""}">3 · Both confirm</span></div>
+        <code>${esc(sumsText(t,o,P))}</code>
+        <div class="acts">
+          <button class="btn ghost" data-act="copy-sums" data-v="${id}">Copy for SUMS</button>
+          ${done?`<span class="hint">Both of you confirmed it's in SUMS.</span>`
+            : sb[me] ? `<span class="hint">You confirmed. Waiting on ${nm(P,other)}.</span>`
+            : W ? `<button class="btn primary" data-act="sums" data-v="${id}">Done in SUMS</button>${sb[other]?`<span class="hint">${nm(P,other)} already confirmed.</span>`:""}` : ""}
+        </div></div>`;
+    } else acts = `<p class="hint">Taken by ${nm(P,t.takerId)}.</p>`;
+  }
+  const taking = !mine && t.takerId===me && (t.status==="agreed"||t.status==="done");
+  const taken = (t.status==="agreed" && !mine && !taking) || t.status==="done";
+  return `<article class="trade ${mine?"mine":""} ${taking?"taking":""} ${blocked?"unavail":""} ${taken?"taken":""}" id="tr-${id}">
+    <div class="trow">${mine?`<span class="yours">Your shift</span>`:taking?`<span class="yours taking">You're taking this</span>`:""}<span class="time">${range(t.s,t.e)}</span><span class="lvl ${t.level}">${lvlName(t.level)}</span><div class="tags">${tags.join("")}</div></div>
+    <div class="trow">${mine?`<span class="muted" style="font-size:13px">You posted this ${ago(t.created)}. Others can offer to take it.</span>`:`${who(P,t.by)}<span class="muted" style="font-size:13px">needs this covered · posted ${ago(t.created)}</span>`}</div>
+    ${t.note?`<p class="note">“${esc(t.note)}”</p>`:""}
+    ${wantsLine}
+    ${acts}
+    ${discussionHTML(id,t,P)}
+  </article>`;
+}
+function discussionHTML(id,t,P){
+  const list=threadFor(id), open=ui.threads.has(id), u=unreadThread(id), last=list[list.length-1]?.[1];
+  const label = open ? "Hide" : list.length ? `Discussion (${list.length})` : "Discussion";
+  let inner="";
+  if(open){
+    const canDel = m => (m.by===S.me && S.canWrite) || (ui.admin && S.canWrite);
+    inner = `${list.length?`<div class="tmsgs" id="tm-${id}">${list.map(([mid,m])=>`<div class="tmsg ${m.kind==="ask"?"ask":""}">${av(P,m.by)}<div class="body"><div class="meta"><b>${nm(P,m.by)}</b>${m.to?`<span>to ${nm(P,m.to)}</span>`:""}<span>${when(m.created)}</span>${canDel(m)?`<button class="del" data-act="del-msg" data-v="${mid}" aria-label="Delete message">${ui.confirm==="m"+mid?"Delete?":"✕"}</button>`:""}</div><div class="txt">${esc(m.text)}</div></div></div>`).join("")}</div>`:`<p class="hint">No messages yet. Ask about the shift or coordinate details here.</p>`}
+      ${S.canWrite?`<div class="tcomp"><textarea id="tc-${id}" data-tc="${id}" rows="1" placeholder="Write a message about this trade" aria-label="Message about this trade">${esc(ui.tdraft[id]||"")}</textarea><button class="btn primary" data-act="tsend" data-v="${id}">Post</button></div>`:""}`;
+  }
+  return `<div class="disc"><div class="disc-row"><button class="disc-toggle" data-act="thread" data-v="${id}" aria-expanded="${open}">${label}${u&&!open?`<span class="new">${u} new</span>`:""}</button>${!open && last?`<span class="last">${nm(P,last.by)}: ${esc(last.text)}</span>`:""}</div>${inner}</div>`;
+}
+function sumsText(t,o,P){
+  const a=P[t.by]?.name||"PI", b=P[t.takerId]?.name||"PI";
+  let s=`${a} → ${b}: ${dayLabel(t.date)}, ${range(t.s,t.e)} (${lvlName(t.level)})`;
+  if(o?.kind==="swap") s += `  |  ${b} → ${a}: ${dayLabel(o.swapDate)}, ${range(o.swapS,o.swapE)}`;
+  return s;
+}
+
+/* coverage finder */
+function candidates(t){
+  const out=[], wants=(t.wants||[]).filter(w=>daysAway(w.date)>=0);
+  for(const [uid,p] of Object.entries(S.pis)){
+    if(uid===t.by || !p.level || !canTakeLevel(p.level,t.level)) continue;
+    if(worksThen(uid,t.date,t.s,t.e) || !willingThen(uid,t.date,t.s,t.e)) continue;
+    const occ=occurrences(uid);
+    const hits=wants.map(w=>({w, o:occ.find(o=>o.date===w.date && o.s<w.e && w.s<o.e)})).filter(x=>x.o);
+    out.push({uid, hits, score:hits.length});
+  }
+  return out.sort((a,b)=>b.score-a.score);
+}
+const askedAlready = (tid, uid) => threadFor(tid).some(([,m])=>m.kind==="ask" && m.by===S.me && m.to===uid);
+function finderHTML(id,t,P){
+  const c=candidates(t);
+  const offered = new Set(offersFor(id).filter(([,o])=>o.status==="pending").map(([,o])=>o.by));
+  const row = x => {
+    const why = x.hits.length ? `<span class="star">★ Works ${x.hits.map(h=>`${dayLabel(h.o.date)} ${range(h.o.s,h.o.e)}`).join(", ")}</span>, a shift you'd take back` : "Marked this hour as willing";
+    const btn = offered.has(x.uid) ? `<span class="tag y">Offered</span>`
+      : askedAlready(id,x.uid) ? `<span class="tag">Asked</span>`
+      : `<button class="btn sm" data-act="ask" data-v="${id}|${esc(x.uid)}">Ask</button>`;
+    return `<div class="match">${who(P,x.uid)}<span class="lvl ${S.pis[x.uid].level}">${lvlName(S.pis[x.uid].level)}</span><span class="why">${why}</span>${btn}</div>`;
+  };
+  return `<div class="sub-block"><h4>Willing to cover</h4>
+    <p class="hint">${lvlName(t.level)} PIs who marked ${DAYS[wd(parse(t.date))]} ${range(t.s,t.e)} as an hour they'd pick up.${c.some(x=>x.hits.length)?" ★ also works a shift you'd take in return.":""} Asking posts in this trade's discussion.</p>
+    ${c.length ? c.map(row).join("") : `<p class="hint">No one has marked this hour as willing yet. Your request is still on the board for anyone to take, and you can ask in the discussion.</p>`}
+  </div>`;
+}
+function offerForm(id,t){
+  const d = ui.draft[id] ||= {kind:(t.wants||[]).length?"swap":"cover", swap:"", note:""};
+  const mineOcc = occurrences(S.me).filter(x=>x.date!==t.date || x.s!==t.s);
+  const wanted = o => (t.wants||[]).some(w=>w.date===o.date && w.s<o.e && o.s<w.e);
+  return `<div class="form">
+    <div class="seg" role="radiogroup" aria-label="Offer type">
+      <label><input type="radio" name="kind-${id}" value="cover" data-draft="${id}" data-k="kind" ${d.kind==="cover"?"checked":""}>Cover</label>
+      <label><input type="radio" name="kind-${id}" value="swap" data-draft="${id}" data-k="kind" ${d.kind==="swap"?"checked":""}>Swap</label>
+    </div>
+    ${d.kind==="swap" ? (mineOcc.length
+      ? `<label class="field">Shift you'd give them<select id="swap-${id}" data-draft="${id}" data-k="swap"><option value="">Choose a shift…</option>${mineOcc.map(x=>{const v=`${x.date}|${x.s}|${x.e}`;return `<option value="${v}" ${d.swap===v?"selected":""}>${wanted(x)?"★ ":""}${dayLabel(x.date)} · ${range(x.s,x.e)}${wanted(x)?" (their preferred return)":""}</option>`}).join("")}</select></label>`
+      : `<p class="hint">You have no upcoming shifts to swap. Add your hours first.</p>`) : ""}
+    <label class="field">Note (optional)<textarea id="note-${id}" data-draft="${id}" data-k="note" placeholder="e.g. I can stay an extra hour if that helps">${esc(d.note)}</textarea></label>
+    <div class="acts"><button class="btn primary" data-act="offer-send" data-v="${id}">Send offer</button><button class="btn ghost" data-act="offer-close">Cancel</button></div>
+  </div>`;
+}
+
+/* ----- hours ----- */
+function blocksToSlots(blocks){ const s=new Set(); for(const b of blocks||[]) for(let m=Math.floor(b.s/60)*60; m<b.e; m+=SLOT) s.add(`${b.d}-${m/60}`); return s; }
+function slotsToBlocks(set){
+  const out=[];
+  for(let d=0;d<7;d++){ let start=null;
+    for(let h=0;h<=24;h++){ const on=h<24 && set.has(`${d}-${h}`);
+      if(on && start===null) start=h;
+      if(!on && start!==null){ out.push({d, s:start*60, e:h*60}); start=null; } } }
+  return out;
+}
+function hoursView(P){
+  const c=cfg(), uid=ui.editing||S.me, pi=S.pis[uid];
+  if(!ui.dirty){ ui.slots = blocksToSlots(pi?.blocks); ui.wslots = blocksToSlots(pi?.willing); }
+  ui.layer ||= "shifts";
+  const W = ui.layer==="willing", set = W ? ui.wslots : ui.slots;
+  const lvl = pi?.level||null, blocks = slotsToBlocks(set);
+  const nShifts = slotsToBlocks(ui.slots).reduce((a,b)=>a+(b.e-b.s),0)/60;
+  const nWill = slotsToBlocks(ui.wslots).reduce((a,b)=>a+(b.e-b.s),0)/60;
+  const total = blocks.reduce((a,b)=>a+(b.e-b.s),0)/60;
+  const whose = ui.editing ? `${nm(P,uid)}'s` : "My";
+  const editBar = ui.editing ? `<div class="banner example"><span><b>Admin:</b> editing ${nm(P,uid)}'s hours and shift type.</span><button class="btn dark" data-act="end-edit" style="margin-left:auto">Done, back to Admin</button></div>` : "";
+  let g = `<div></div>${DAYS.map((d,i)=>`<div class="dh ${c.days[i]?"":"off"}">${d}</div>`).join("")}`;
+  for(let h=c.open;h<c.close;h++){
+    g += `<div class="tl">${tm(h*60)}</div>`;
+    for(let d=0;d<7;d++){
+      const k=`${d}-${h}`, sh=ui.slots.has(k), wi=ui.wslots.has(k), off=!c.days[d];
+      const on = W ? wi : sh, top = on && !set.has(`${d}-${h-1}`);
+      const locked = W ? sh : wi; // an hour is either a shift or a willing hour, never both
+      const label = `${DAYS_LONG[d]} ${range(h*60,h*60+60)}${sh?", your shift":wi?", willing to pick up":""}${off?", studio closed":""}`;
+      g += `<button class="cell ${sh?"on":""} ${wi?"will":""} ${top?"top":""} ${(W&&sh)||(!W&&wi)?"dim":""}" data-slot="${k}" aria-pressed="${on}" aria-label="${label}" ${!S.canWrite||off||locked?"disabled":""}></button>`;
+    }
+  }
+  return `${editBar}<div class="panel">
+    <div class="hrow"><h2>${ui.editing?"Profile":"My profile"}</h2></div>
+    <div class="custom" style="padding-top:0"><label class="field">Name<input type="text" id="pf-name" maxlength="60" value="${esc(pi?.name||"")}" placeholder="First Last" ${!S.canWrite?"disabled":""}></label><button class="btn" data-act="save-name" ${!S.canWrite?"disabled":""}>Save name</button></div>
+    <div class="field">Shift type
+      <div class="seg" role="radiogroup" aria-label="Shift type">
+        <label><input type="radio" name="lvl" value="full" data-act-change="level" ${lvl==="full"?"checked":""} ${!S.canWrite?"disabled":""}>Full PI</label>
+        <label><input type="radio" name="lvl" value="provisional" data-act-change="level" ${lvl==="provisional"?"checked":""} ${!S.canWrite?"disabled":""}>Provisional PI</label>
+      </div></div>
+    <p class="hint">${c.fullTakesProv?"Full PIs can take Full or Provisional shifts. Provisional PIs take Provisional shifts.":"PIs can only take trades of their own shift type."}</p>
+  </div>
+  <div class="panel">
+    <div class="hrow"><h2>${whose} week</h2><span class="saved" id="saved">${esc(ui.saveState)}</span></div>
+    <div class="seg layer" role="radiogroup" aria-label="What you're marking">
+      <label><input type="radio" name="layer" value="shifts" data-act-change="layer" ${!W?"checked":""}><i class="sw sw-shift"></i>My shifts <span class="muted">(${nShifts})</span></label>
+      <label><input type="radio" name="layer" value="willing" data-act-change="layer" ${W?"checked":""}><i class="sw sw-will"></i>Willing to pick up <span class="muted">(${nWill})</span></label>
+    </div>
+    <p class="hint">${W ? "Mark hours you'd be happy to cover if someone asks. Only people who mark an hour show up when someone uses Find cover for it. Your own shifts are greyed out here."
+      : "Each box is a one-hour shift. Mark the hours you work every week. Click or drag; tap on a phone. Hours marked as willing to pick up are locked here; clear them in Willing to pick up first. Changes save on their own."}</p>
+    ${!W?`<div class="callout"><b>Masters, exec and directors:</b> only put your Full PI shift here.</div>`:""}
+    <div class="gridwrap"><div class="grid ${W?"willmode":""}" id="hgrid">${g}</div></div>
+    <div class="hrow"><span class="mono" style="font-weight:600">${total} ${W?"willing hour":"shift"}${total===1?"":"s"} / week</span>
+      <div class="blocks">${blocks.map((b,i)=>`<span class="blk">${DAYS[b.d]} <span class="mono">${range(b.s,b.e)}</span><span class="muted">${!W&&(b.e-b.s)/60>1?`· ${(b.e-b.s)/60} back-to-back`:""}</span><button data-act="rm-block" data-v="${i}" aria-label="Remove ${DAYS[b.d]} ${range(b.s,b.e)}" ${!S.canWrite?"disabled":""}>✕</button></span>`).join("") || `<span class="hint">${W?"No willing hours yet.":"No shifts yet."}</span>`}</div>
+      ${blocks.length && S.canWrite?`<button class="btn ghost danger" data-act="clear-hours" style="margin-left:auto">${ui.confirm==="clear"?"Confirm clear":"Clear"}</button>`:""}</div>
+  </div>`;
+}
+let saveT=null;
+function scheduleSave(){
+  ui.dirty=true; ui.saveState="Saving…"; ui.saveFor=ui.editing||S.me; const el=document.getElementById("saved"); if(el) el.textContent=ui.saveState;
+  clearTimeout(saveT); saveT=setTimeout(saveHours, 700);
+}
+async function saveHours(){
+  const uid=ui.saveFor||S.me, cur=S.pis[uid]||{};
+  const ok = await write("pis", uid, { ...cur, level: cur.level || null, blocks: slotsToBlocks(ui.slots), willing: slotsToBlocks(ui.wslots||new Set()), updated: nowIso() });
+  ui.dirty=false; ui.saveState = ok ? "Saved" : "Not saved"; render(true);
+}
+const curSet = () => ui.layer==="willing" ? ui.wslots : ui.slots;
+function paintCell(btn,on){
+  const k=btn.dataset.slot, W=ui.layer==="willing";
+  if(W){ on?ui.wslots.add(k):ui.wslots.delete(k); btn.classList.toggle("will",on); }
+  else { if(ui.wslots.has(k)) return; on?ui.slots.add(k):ui.slots.delete(k); btn.classList.toggle("on",on); }
+  btn.setAttribute("aria-pressed",on);
+}
+
+/* ----- admin ----- */
+function adminView(P){
+  if(!ui.admin){
+    if(S.backend==="supa") return `<div class="panel lock">
+      <h2>Admin sign-in</h2><p class="hint">Settings for open days, hours, closures, trade rules and the roster. Sign in with your admin account.</p>
+      <label class="field">Email<input type="text" id="adm-email" autocomplete="username" inputmode="email"></label>
+      <label class="field">Password<input type="password" id="adm-pw" autocomplete="current-password"></label>
+      <div class="acts"><button class="btn primary" data-act="admin-signin">Sign in</button></div>
+      <p class="hint">Admin accounts live in Supabase. The database itself refuses settings and roster changes from anyone who isn't on the admin list.</p></div>`;
+    if(S.backend==="claude") return `<div class="panel lock"><h2>Admin</h2><p class="hint">Only the board's owner can change settings and the roster here.</p></div>`;
+    return `<div class="panel lock"><h2>Admin</h2><p class="hint">In this example copy anyone can try the admin tools. On the live site, admins sign in with their own account.</p><div class="acts"><button class="btn primary" data-act="admin-demo">Open admin tools</button></div></div>`;
+  }
+  const d = ui.adminDraft ||= structuredClone(cfg());
+  const changed = JSON.stringify(d)!==JSON.stringify(cfg());
+  const live = activeTrades().sort((a,b)=>a[1].date.localeCompare(b[1].date)||a[1].s-b[1].s);
+  return `<div class="panel">
+    <div class="hrow"><h2>Studio settings</h2><span class="saved">${changed?"Unsaved changes":"Saved"}</span>
+      <button class="btn primary" data-act="adm-save" ${changed&&S.canWrite?"":"disabled"}>Save settings</button>${S.backend==="claude"?"":`<button class="btn ghost" data-act="lock">${S.backend==="supa"?"Sign out of admin":"Close admin"}</button>`}</div>
+    <div class="field">Open days<div class="days7">${DAYS.map((n,i)=>`<label><input type="checkbox" data-adm="day" data-i="${i}" ${d.days[i]?"checked":""}>${n}</label>`).join("")}</div></div>
+    <div class="adm-grid">
+      <label class="field">Opens<select data-adm="open">${hourOpts(d.open,0,23)}</select></label>
+      <label class="field">Closes<select data-adm="close">${hourOpts(d.close,1,24)}</select></label>
+      <label class="field">Urgent when less than (hours)<input type="number" min="1" max="336" data-adm="urgentHours" value="${d.urgentHours}"></label>
+      <label class="field">Shifts offered when requesting (days ahead)<input type="number" min="7" max="60" data-adm="lookahead" value="${d.lookahead}"></label>
+    </div>
+    <label class="check"><input type="checkbox" data-adm="fullTakesProv" ${d.fullTakesProv?"checked":""}>Full PIs can also take Provisional shifts</label>
+    <label class="field">Board announcement (shown at the top of the trade board)<textarea data-adm="announcement" placeholder="e.g. Finals week: post trades at least 48 hours ahead">${esc(d.announcement)}</textarea></label>
+  </div>
+  <div class="panel">
+    <h2>Closures</h2><p class="hint">Breaks, holidays or special closures. Shifts on these dates are hidden from requests and the board marks them closed.</p>
+    ${(d.closures||[]).length ? d.closures.map((x,i)=>`<div class="closure"><span class="mono">${dayLabel(x.from)}${x.to!==x.from?` – ${dayLabel(x.to)}`:""}</span><span style="flex:1">${esc(x.label||"Closed")}</span><button class="btn sm ghost danger" data-act="adm-rm-closure" data-v="${i}">Remove</button></div>`).join("") : `<p class="hint">No closures.</p>`}
+    <div class="custom">
+      <label class="field">From<input type="date" id="cl-from"></label>
+      <label class="field">To<input type="date" id="cl-to"></label>
+      <label class="field">Label<input type="text" id="cl-label" placeholder="Fall break" maxlength="60"></label>
+      <button class="btn" data-act="adm-add-closure">Add closure</button>
+    </div>
+  </div>
+  ${adminsHTML()}
+  ${adminRosterHTML(P)}
+  <div class="panel">
+    <h2>Active trades</h2><p class="hint">Remove a trade that was posted by mistake. While Admin is unlocked you can also delete any message in a trade's discussion.</p>
+    ${live.length ? live.map(([id,t])=>`<div class="closure"><span class="mono">${dayLabel(t.date)} ${range(t.s,t.e)}</span><span class="lvl ${t.level}">${lvlName(t.level)}</span><span style="flex:1">${nm(P,t.by)} · ${t.status}</span><button class="btn sm ghost danger" data-act="adm-rm-trade" data-v="${id}">${ui.confirm==="a"+id?"Click again":"Remove"}</button></div>`).join("") : `<p class="hint">No active trades.</p>`}
+  </div>`;
+}
+function adminRosterHTML(P){
+  const rows = Object.entries(S.pis).sort((a,b)=>(P[a[0]]?.name||"").localeCompare(P[b[0]]?.name||""));
+  const W=S.canWrite;
+  return `<div class="panel">
+    <div class="hrow"><h2>Roster</h2><span class="muted" style="font-size:13px">${rows.length} PI${rows.length===1?"":"s"}</span>
+      ${hasExamples()&&W?`<button class="btn sm ghost danger" data-act="adm-rm-examples" style="margin-left:auto">${ui.confirm==="ex"?"Click again to delete all example data":"Remove all example data"}</button>`:""}</div>
+    <p class="hint">Change anyone's shift type or hours, add PIs, or take people off. Removing someone also takes down their open trade requests and offers.</p>
+    <div class="custom" style="padding-top:0">
+      <label class="field">Name<input type="text" id="np-name" maxlength="60" placeholder="First L."></label>
+      <label class="field">Shift type<select id="np-lvl"><option value="full">Full</option><option value="provisional">Provisional</option></select></label>
+      <button class="btn" data-act="adm-add-pi" ${W?"":"disabled"}>Add PI</button>
+    </div>
+    ${rows.length ? rows.map(([id,p])=>{ const h=(p.blocks||[]).reduce((a,b)=>a+(b.e-b.s),0)/60;
+      return `<div class="closure">${who(P,id)}${p.example?`<span class="tag">Example</span>`:""}
+        <select data-pilvl="${esc(id)}" aria-label="Shift type" style="margin-left:auto" ${W?"":"disabled"}><option value="full" ${p.level==="full"?"selected":""}>Full</option><option value="provisional" ${p.level==="provisional"?"selected":""}>Provisional</option></select>
+        <span class="mono muted" style="font-size:13px;min-width:56px;text-align:right">${h} h/wk</span>
+        <button class="btn sm" data-act="adm-edit-pi" data-v="${esc(id)}" ${W?"":"disabled"}>Edit hours</button>
+        <button class="btn sm ghost danger" data-act="adm-rm-pi" data-v="${esc(id)}" ${W?"":"disabled"}>${ui.confirm==="r"+id?"Click again":"Remove"}</button></div>`; }).join("") : `<p class="hint">No PIs yet.</p>`}
+  </div>`;
+}
+async function removePI(id){
+  for(const [tid,t] of Object.entries(S.trades)) if(t.by===id && t.status==="open") await write("trades",tid,{status:"cancelled"},true);
+  for(const [oid,o] of Object.entries(S.offers)) if(o.by===id && o.status==="pending") await write("offers",oid,{status:"withdrawn"},true);
+  await remove("pis",id);
+}
+async function checkAdmin(){
+  if(S.backend!=="supa") return ui.admin;
+  const u=(await S.sb.auth.getUser()).data?.user || null;
+  S.uid=u?.id || null;
+  if(!u || u.is_anonymous){ ui.admin=false; S.admins={}; return false; }
+  const { data } = await S.sb.from("admins").select("uid").eq("uid", u.id).maybeSingle();
+  ui.admin=!!data;
+  if(ui.admin) await loadAdmins(); else S.admins={};
+  return ui.admin;
+}
+async function loadAdmins(){
+  const { data } = await S.sb.from("admins").select("*");
+  S.admins = Object.fromEntries((data||[]).map(a=>[a.uid, {name:a.name, email:a.email}]));
+  render();
+}
+
+/* ----- request modal ----- */
+function renderModal(){
+  const el=document.getElementById("modal");
+  if(!ui.modal){ el.innerHTML=""; return; }
+  const m=ui.modal, lvl=myLevel()||"provisional", c=cfg();
+  if(m.posted){
+    const n=m.posted.length;
+    el.innerHTML = `<div class="scrim" data-act="close-modal"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mh">
+      <h2 id="mh">${n===1?"Shift posted":`${n} shifts posted`}</h2>
+      <div class="blocks">${m.posted.map(p=>`<span class="blk" style="padding-right:10px">${dayLabel(p.date)} <span class="mono">${range(p.s,p.e)}</span></span>`).join("")}</div>
+      <p>${n===1?"It's":"They're"} on the board. Use <b>Find cover</b> on a card to ask specific PIs.</p>
+      <div class="acts"><button class="btn primary" data-act="close-and-find" data-v="${m.posted[0].id}">Find cover</button><button class="btn" data-act="close-modal">Done</button></div></div></div>`;
+    return;
+  }
+  m.picks ||= {}; m.wants ||= [];
+  const taken = new Set(Object.values(S.trades).filter(t=>t.by===S.me && (t.status==="open"||t.status==="agreed")).map(t=>`${t.date}|${t.s}`));
+  const occ = occurrences(S.me), byDay={};
+  occ.forEach(o=>(byDay[o.date]??=[]).push(o));
+  const openDates=[]; for(let k=0;k<c.lookahead;k++){ const ds=iso(addDays(today(),k)); if(!isClosed(ds)) openDates.push(ds); }
+  const picks=Object.values(m.picks).sort((a,b)=>a.date.localeCompare(b.date)||a.s-b.s);
+  el.innerHTML = `<div class="scrim" data-act="close-modal"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mh">
+    <div class="hrow"><h2 id="mh">Request a trade</h2><button class="btn ghost" data-act="close-modal" style="margin-left:auto" aria-label="Close">✕</button></div>
+    <p class="hint">Each shift is one hour. Pick every hour you can't make; back-to-back hours are fine. These come from your weekly hours.</p>
+    ${occ.length?`<div class="occdays">${Object.entries(byDay).map(([ds,list])=>`<div class="occday"><b>${dayLabel(ds)}</b><div class="hours">${list.map(o=>{const k=`${o.date}|${o.s}`;
+      return `<button class="hourb" data-act="pick" data-v="${o.date}|${o.s}" aria-pressed="${!!m.picks[k]}" ${taken.has(k)?"disabled title=\"Already posted\"":""}>${range(o.s,o.e)}</button>`}).join("")}</div></div>`).join("")}</div>`
+      :`<p class="hint">No upcoming shifts found. Add your hours in Me, or enter a time below.</p>`}
+    <details ${!occ.length?"open":""}><summary>A shift that isn't on your usual schedule</summary>
+      <div class="custom">
+        <label class="field">Date<input type="date" id="c-date" min="${iso(today())}" value="${esc(m.cdate||"")}"></label>
+        <label class="field">Hour<select id="c-s">${hourOpts(m.cs??c.open+4, c.open, c.close-1)}</select></label>
+        <button class="btn" data-act="pick-custom">Add this hour</button>
+      </div></details>
+    ${picks.length?`<div class="pick">
+      <div class="field">${picks.length} shift${picks.length>1?"s":""} selected
+        <div class="blocks">${picks.map(p=>`<span class="blk">${dayLabel(p.date)} <span class="mono">${range(p.s,p.e)}</span><button data-act="pick" data-v="${p.date}|${p.s}" aria-label="Remove">✕</button></span>`).join("")}</div></div>
+      <div class="seg" role="radiogroup" aria-label="Shift type">
+        <label><input type="radio" name="mlvl" value="full" ${(m.level||lvl)==="full"?"checked":""}>Full shift</label>
+        <label><input type="radio" name="mlvl" value="provisional" ${(m.level||lvl)==="provisional"?"checked":""}>Provisional shift</label></div>
+      <div class="field">Preferred shifts in return (optional)
+        <span class="hint" style="font-weight:400">One-hour shifts you'd prefer to pick up in exchange. The board finds PIs who work them and are free for your shift.</span>
+        <div class="blocks">${m.wants.map((w,i)=>`<span class="blk">${dayLabel(w.date)} <span class="mono">${range(w.s,w.e)}</span><button data-act="rm-want" data-v="${i}" aria-label="Remove">✕</button></span>`).join("")}</div>
+        <div class="custom" style="padding-top:4px">
+          <select id="w-date" aria-label="Day">${openDates.map(ds=>`<option value="${ds}" ${m.wdate===ds?"selected":""}>${dayLabel(ds)}</option>`).join("")}</select>
+          <select id="w-s" aria-label="Hour">${hourOpts(m.ws??c.open+4, c.open, c.close-1)}</select>
+          <button class="btn sm" data-act="add-want">Add</button>
+        </div></div>
+      <label class="field">Note (optional)<textarea id="m-note" placeholder="Why you need it covered">${esc(m.note||"")}</textarea></label>
+      <button class="btn primary" data-act="post">Post${picks.length>1?` ${picks.length} shifts`:""}</button></div>`:""}
+  </div></div>`;
+}
+function syncModalInputs(){
+  const m=ui.modal; if(!m) return;
+  const g=id=>document.getElementById(id);
+  if(g("m-note")) m.note=g("m-note").value;
+  const l=document.querySelector('input[name="mlvl"]:checked'); if(l) m.level=l.value;
+  if(g("c-date")){ m.cdate=g("c-date").value; m.cs=+g("c-s").value; }
+  if(g("w-date")){ m.wdate=g("w-date").value; m.ws=+g("w-s").value; }
+}
+
+/* ---------- copy ---------- */
+function copy(text){
+  const fallback=()=>toast("Copy blocked here. Select the text: "+text, 7000);
+  try{ navigator.clipboard.writeText(text).then(()=>toast("Copied"), fallback); }catch(e){ fallback(); }
+}
+function viewTrade(id, openThread){ if(!S.trades[id]) return; ui.tab="board"; ui.filter="all"; ui.day=null; ui.flash=id; if(openThread) ui.threads.add(id); render(true); }
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e=>{
+  const el=e.target.closest("[data-act]"); if(!el) return;
+  const act=el.dataset.act, v=el.dataset.v;
+  if(act==="close-modal" && el.classList.contains("scrim") && e.target!==el) return;
+  const keepConfirm = ["cancel","clear-hours","adm-rm-trade","del-msg","adm-rm-pi","adm-rm-examples","rm-admin"].includes(act);
+  if(!keepConfirm) ui.confirm=null;
+  switch(act){
+    case "tab": ui.tab=v; ui.editing=null; ui.dirty=false; ui.rosterCell=null; if(v==="admin") ui.adminDraft=null; render(true); break;
+    case "filter": ui.filter=v; render(true); break;
+    case "day": ui.day = ui.day===v?null:v; render(true); break;
+    case "goto": viewTrade(v, el.dataset.thread==="1"); break;
+    case "thread": ui.threads.has(v)?ui.threads.delete(v):ui.threads.add(v); render(true); if(ui.threads.has(v)) setTimeout(()=>document.getElementById("tc-"+v)?.focus(),0); break;
+    case "tsend": { const ta=document.getElementById("tc-"+v); if(ta && await postMsg(v, ta.value)){ delete ui.tdraft[v]; ta.value=""; render(true); setTimeout(()=>document.getElementById("tc-"+v)?.focus(),0); } break; }
+    case "del-msg":
+      if(ui.confirm!=="m"+v){ ui.confirm="m"+v; render(true); break; }
+      ui.confirm=null; await remove("msgs", v); break;
+    case "offer-open": ui.offering=v; render(true); break;
+    case "offer-close": ui.offering=null; render(true); break;
+    case "finder": ui.finder = ui.finder===v?null:v; render(true); break;
+    case "offer-send": {
+      const t=S.trades[v], d=ui.draft[v]||{kind:"cover"};
+      if(!t || t.status!=="open"){ toast("That trade isn't open anymore."); break; }
+      if(blockedReason(t)){ toast("You can't take this one: "+blockedReason(t)+"."); break; }
+      const o={ trade:v, by:S.me, kind:d.kind, note:(d.note||"").trim().slice(0,400), status:"pending", created:nowIso() };
+      if(d.kind==="swap"){ if(!d.swap){ toast("Choose the shift you'd give them."); break; } const [sd,ss,se]=d.swap.split("|"); Object.assign(o,{swapDate:sd,swapS:+ss,swapE:+se}); }
+      ui.offering=null; delete ui.draft[v];
+      if(await write("offers", newId(), o)) toast("Offer sent");
+      render(true); break; }
+    case "withdraw": await write("offers", v, {status:"withdrawn"}, true); toast("Offer withdrawn"); break;
+    case "accept": {
+      const o=S.offers[v]; if(!o) break;
+      if(await write("trades", o.trade, {status:"agreed", acceptedOffer:v, takerId:o.by, agreedAt:nowIso()}, true)){
+        await write("offers", v, {status:"accepted"}, true); ui.finder=null;
+        toast("Accepted. Now enter it in SUMS.");
+      } break; }
+    case "cancel":
+      if(ui.confirm!=="c"+v){ ui.confirm="c"+v; render(true); break; }
+      ui.confirm=null; await write("trades", v, {status:"cancelled"}, true); toast("Request removed"); purgePast(); break;
+    case "sums": {
+      const t=S.trades[v]; if(!t) break;
+      const sb={...(t.sumsBy||{}), [S.me]:true}, both = sb[t.by] && sb[t.takerId];
+      await write("trades", v, both?{sumsBy:{[S.me]:true}, status:"done"}:{sumsBy:{[S.me]:true}}, true);
+      toast(both?"Trade complete":"Marked as entered"); break; }
+    case "copy-sums": { const t=S.trades[v]; const P=await people([t.by,t.takerId],true); copy(sumsText(t,S.offers[t.acceptedOffer],P)); break; }
+    case "ask": {
+      const [tid,uid]=v.split("|"), t=S.trades[tid]; if(!t) break;
+      const P=await people([uid],true);
+      const hit=candidates(t).find(x=>x.uid===uid)?.hits?.[0];
+      const text=`${P[uid]?.name||"Hi"}, can you take this shift?${hit?` I could take your ${dayLabel(hit.o.date)} ${range(hit.o.s,hit.o.e)} in return.`:""}`;
+      if(await postMsg(tid, text, {kind:"ask", to:uid})){ ui.threads.add(tid); toast("Asked in this trade's discussion"); }
+      render(true); break; }
+    case "open-request": ui.modal={}; renderModal(); break;
+    case "close-modal": ui.modal=null; renderModal(); break;
+    case "close-and-find": ui.modal=null; renderModal(); ui.finder=v; viewTrade(v); break;
+    case "pick": {
+      syncModalInputs(); const [d,st]=v.split("|"), k=`${d}|${st}`, m=ui.modal;
+      if(m.picks[k]) delete m.picks[k]; else m.picks[k]={date:d, s:+st, e:+st+SLOT};
+      renderModal(); break; }
+    case "pick-custom": {
+      syncModalInputs(); const m=ui.modal;
+      if(!m.cdate){ toast("Choose a date."); break; }
+      if(daysAway(m.cdate)<0 || (daysAway(m.cdate)===0 && m.cs*60<=nowMin())){ toast("Pick a time that hasn't started yet."); break; }
+      if(isClosed(m.cdate)){ toast("The studio is closed that day."); break; }
+      m.picks[`${m.cdate}|${m.cs*60}`]={date:m.cdate, s:m.cs*60, e:m.cs*60+SLOT}; renderModal(); break; }
+    case "add-want": {
+      syncModalInputs(); const m=ui.modal;
+      if(!m.wdate){ toast("No open days to choose from."); break; }
+      if(!m.wants.some(w=>w.date===m.wdate && w.s===m.ws*60)) m.wants.push({date:m.wdate, s:m.ws*60, e:m.ws*60+SLOT});
+      renderModal(); break; }
+    case "rm-want": syncModalInputs(); ui.modal.wants.splice(+v,1); renderModal(); break;
+    case "post": {
+      syncModalInputs(); const m=ui.modal, posted=[];
+      const picks=Object.values(m.picks).sort((a,b)=>a.date.localeCompare(b.date)||a.s-b.s);
+      for(const p of picks){
+        const id=newId();
+        const t={ by:S.me, level:m.level||myLevel()||"provisional", date:p.date, s:p.s, e:p.e, note:(m.note||"").trim().slice(0,400), wants:m.wants||[], status:"open", created:nowIso(), startsAt: parse(p.date).getTime()+p.s*60000 };
+        if(await write("trades", id, t)) posted.push({...t,id}); else break;
+      }
+      if(posted.length){ ui.modal={posted}; renderModal(); render(true); }
+      break; }
+    case "rm-block": { const set=curSet(), b=slotsToBlocks(set)[+v]; for(let m=b.s;m<b.e;m+=SLOT) set.delete(`${b.d}-${m/60}`); ui.dirty=true; render(true); scheduleSave(); break; }
+    case "clear-hours":
+      if(ui.confirm!=="clear"){ ui.confirm="clear"; render(true); break; }
+      ui.confirm=null; (ui.layer==="willing"?ui.wslots:ui.slots).clear(); ui.dirty=true; render(true); scheduleSave(); break;
+    case "admin-demo": ui.admin=true; ui.adminDraft=null; render(true); break;
+    case "admin-signin": {
+      const em=document.getElementById("adm-email")?.value.trim(), pw=document.getElementById("adm-pw")?.value||"";
+      if(!em || !pw){ toast("Enter your admin email and password."); break; }
+      const { error } = await S.sb.auth.signInWithPassword({email:em, password:pw});
+      if(error){ toast(/rate|too many/i.test(error.message||"") ? "Too many attempts. Wait a few minutes and try again." : "That email and password didn't work."); break; }
+      if(await checkAdmin()){ ui.adminDraft=null; toast("Signed in as admin"); render(true); }
+      else { toast("That account isn't on the admin list."); await S.sb.auth.signOut(); await S.sb.auth.signInAnonymously(); await checkAdmin(); }
+      break; }
+    case "lock":
+      if(S.backend==="supa"){ try{ await S.sb.auth.signOut(); await S.sb.auth.signInAnonymously(); await checkAdmin(); }catch(e){} }
+      ui.admin=false; ui.tab="board"; render(true); break;
+    case "adm-save": {
+      const d=ui.adminDraft; if(d.close<=d.open){ toast("Closing time must be after opening time."); break; }
+      if(await write("config","studio",structuredClone(d))) toast("Settings saved");
+      ui.adminDraft=null; render(true); break; }
+    case "adm-add-closure": {
+      const f=document.getElementById("cl-from").value, t=document.getElementById("cl-to").value||f, l=document.getElementById("cl-label").value.trim();
+      if(!f){ toast("Choose a start date."); break; } if(t<f){ toast("The end date is before the start date."); break; }
+      ui.adminDraft.closures=[...(ui.adminDraft.closures||[]), {from:f,to:t,label:l}].sort((a,b)=>a.from.localeCompare(b.from)); render(true); break; }
+    case "adm-rm-closure": ui.adminDraft.closures.splice(+v,1); render(true); break;
+    case "adm-rm-trade":
+      if(ui.confirm!=="a"+v){ ui.confirm="a"+v; render(true); break; }
+      ui.confirm=null; await write("trades",v,{status:"cancelled"},true); toast("Trade removed"); purgePast(); break;
+    case "adm-edit-pi": ui.editing = v===S.me ? null : v; ui.dirty=false; ui.saveState=""; ui.tab="hours"; window.scrollTo(0,0); render(true); break;
+    case "end-edit": ui.editing=null; ui.dirty=false; ui.saveState=""; ui.tab="admin"; render(true); break;
+    case "adm-add-pi": {
+      const n=document.getElementById("np-name")?.value.trim(), l=document.getElementById("np-lvl")?.value||"full";
+      if(!n){ toast("Enter a name."); break; }
+      const id="pi-"+newId();
+      if(await write("pis", id, {name:n.slice(0,60), level:l, blocks:[], updated:nowIso()})){ toast(`Added ${n}. Now set their hours.`); ui.editing=id; ui.dirty=false; ui.tab="hours"; render(true); }
+      break; }
+    case "adm-rm-pi":
+      if(ui.confirm!=="r"+v){ ui.confirm="r"+v; render(true); break; }
+      ui.confirm=null; await removePI(v); toast("Removed from the roster"); render(true); break;
+    case "adm-rm-examples": {
+      if(ui.confirm!=="ex"){ ui.confirm="ex"; render(true); break; }
+      ui.confirm=null; toast("Removing example data…", 8000);
+      if(S.mode!=="live"){ for(const col of ["msgs","offers","trades","pis"]) for(const [id,x] of Object.entries(S[col])) if(x.example) await remove(col,id); }
+      else {
+        for(const [id,t] of Object.entries(S.trades)) if(t.example) await remove("trades",id);
+        for(const [id,m] of Object.entries(S.msgs)) if(m.example && !S.trades[m.trade]?.example) await remove("msgs",id);
+        for(const [id,o] of Object.entries(S.offers)) if(o.example && !S.trades[o.trade]?.example) await remove("offers",id);
+        const ex=Object.keys(S.pis).filter(id=>S.pis[id].example);
+        if(ex.length){ if(S.backend==="supa"){ for(const id of ex) await remove("pis",id); } else { try{ await patchDoc("board","roster",{pis:Object.fromEntries(ex.map(id=>[id,DEL]))}); }catch(e){ writeError(e); } } }
+      }
+      toast("Example data removed"); render(true); break; }
+    case "id-pick": {
+      const v2=document.getElementById("id-pick")?.value; if(!v2){ toast("Choose your name."); break; }
+      if(await write("pis", v2, {owner: S.uid||null, updated:nowIso()}, true)){ setMe(v2); ui.tab="hours"; render(true); }
+      break; }
+    case "setup-done": {
+      const n=document.getElementById("su-name")?.value.trim(), l=document.querySelector('input[name="su-lvl"]:checked')?.value;
+      ui.setup={name:n||"", level:l||""};
+      if(!n){ toast("Enter your name."); break; }
+      if(!l){ toast("Choose Full or Provisional."); break; }
+      const fb=S.backend==="supa", id = fb ? "pi-"+newId() : S.me;
+      const doc={name:n.slice(0,60), level:l, blocks: S.mode==="demo" ? structuredClone(DEMO_YOU_BLOCKS) : [], willing: S.mode==="demo" ? structuredClone(DEMO_YOU_WILLING) : [], updated:nowIso()};
+      if(fb) doc.owner=S.uid||null;
+      if(await write("pis", id, doc)){ if(fb) setMe(id); if(S.mode==="demo" && isJCO()) ui.admin=true; ui.tab="hours"; ui.setup=null; toast("Now mark the hours you work each week."); render(true); }
+      break; }
+    case "save-name": {
+      const n=document.getElementById("pf-name")?.value.trim(), uid=ui.editing||S.me;
+      if(!n){ toast("Enter a name."); break; }
+      if(await write("pis", uid, {name:n.slice(0,60), updated:nowIso()}, true)){ if(S.mode==="demo" && isJCO()) ui.admin=true; toast("Name saved"); render(true); }
+      break; }
+    case "add-admin": {
+      const n=document.getElementById("na-name")?.value.trim(), em=document.getElementById("na-email")?.value.trim(), pw=document.getElementById("na-pw")?.value||"";
+      if(!n || !em){ toast("Enter their name and email."); break; }
+      if(S.backend!=="supa"){ S.admins={...S.admins, ["a-"+newId()]:{name:n,email:em}}; toast(`${n} is now an admin (example only)`); render(true); break; }
+      if(pw.length<8){ toast("Use a temporary password of at least 8 characters."); break; }
+      try{
+        // a second, throwaway connection creates their account without signing you out
+        S.sb2 ||= supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:false, autoRefreshToken:false, detectSessionInUrl:false, storageKey:"shift-board-secondary"}});
+        const { data, error } = await S.sb2.auth.signUp({email:em, password:pw});
+        if(error) throw error;
+        const uid=data.user?.id;
+        if(!uid || (Array.isArray(data.user.identities) && data.user.identities.length===0)){ toast("That email already has an account. Add them from Supabase instead (see the setup notes).", 7000); break; }
+        const r = await S.sb.from("admins").insert({uid, name:n.slice(0,60), email:em});
+        if(r.error) throw r.error;
+        toast(`${n} is now an admin`); await loadAdmins();
+      }catch(err){
+        toast(/invalid/i.test(err?.message||"") ? "That email doesn't look right." : /password/i.test(err?.message||"") ? (err.message) : "Couldn't add that admin. Check the email and try again.", 6000);
+      }
+      break; }
+    case "rm-admin":
+      if(ui.confirm!=="ad"+v){ ui.confirm="ad"+v; render(true); break; }
+      ui.confirm=null;
+      if(S.backend==="supa"){ if(await remove("admins", v)){ toast("Admin removed"); await loadAdmins(); } }
+      else { const a={...S.admins}; delete a[v]; S.admins=a; render(true); }
+      break;
+    case "switch-user": setMe(null); break;
+  }
+});
+function setMe(id){
+  S.me=id; try{ id?localStorage.setItem("st-me",id):localStorage.removeItem("st-me"); }catch(e){}
+  try{ S.mine = JSON.parse(localStorage.getItem("st-seen-"+id)||"null") || {seen:{}}; }catch(e){ S.mine={seen:{}}; }
+  render(true);
+}
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && ui.modal){ ui.modal=null; renderModal(); }
+  if(e.target.dataset?.tc && e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); document.querySelector(`[data-act="tsend"][data-v="${e.target.dataset.tc}"]`)?.click(); }
+});
+document.addEventListener("change", async e=>{
+  const el=e.target;
+  if(el.dataset.actChange==="layer"){ ui.layer=el.value; ui.confirm=null; render(true); return; }
+  if(el.dataset.actChange==="level"){
+    const uid=ui.editing||S.me, cur=S.pis[uid]||{blocks:[]};
+    await write("pis", uid, {...cur, level:el.value, blocks: ui.dirty?slotsToBlocks(ui.slots):(cur.blocks||[]), willing: ui.dirty?slotsToBlocks(ui.wslots||new Set()):(cur.willing||[]), updated:nowIso()});
+    toast(`Set to ${lvlName(el.value)} PI`); render(true);
+  }
+  if(el.dataset.pilvl){ await write("pis", el.dataset.pilvl, {level:el.value, updated:nowIso()}, true); toast(`Set to ${lvlName(el.value)}`); }
+  if(el.dataset.draft){ const d=ui.draft[el.dataset.draft] ||= {kind:"cover",swap:"",note:""}; d[el.dataset.k]=el.value; if(el.dataset.k==="kind") render(true); }
+  if(el.dataset.adm){ admInput(el); render(true); }
+});
+function admInput(el){
+  const d=ui.adminDraft; if(!d) return; const k=el.dataset.adm;
+  if(k==="day") d.days[+el.dataset.i]=el.checked;
+  else if(k==="fullTakesProv") d.fullTakesProv=el.checked;
+  else if(k==="open"||k==="close") d[k]=+el.value;
+  else if(k==="urgentHours"||k==="lookahead"){ const n=Math.round(+el.value); if(n>0) d[k]=n; }
+  else if(k==="announcement") d.announcement=el.value.slice(0,300);
+}
+document.addEventListener("input", e=>{
+  const el=e.target;
+  if(el.dataset.draft){ const d=ui.draft[el.dataset.draft] ||= {kind:"cover",swap:"",note:""}; d[el.dataset.k]=el.value; }
+  if(el.dataset.tc){ ui.tdraft[el.dataset.tc]=el.value; el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,160)+"px"; }
+  if(el.dataset.adm==="announcement") admInput(el);
+});
+
+/* grid painting: mouse/pen drag paints, touch and keyboard toggle via click */
+let painting=null, lastPtr="mouse";
+document.addEventListener("pointerdown", e=>{
+  lastPtr=e.pointerType;
+  const c=e.target.closest("#hgrid .cell"); if(!c || c.disabled || e.pointerType==="touch") return;
+  e.preventDefault(); painting=!curSet().has(c.dataset.slot); paintCell(c,painting);
+});
+document.addEventListener("pointermove", e=>{
+  if(painting===null) return;
+  const c=document.elementFromPoint(e.clientX,e.clientY)?.closest?.("#hgrid .cell");
+  if(c && !c.disabled && curSet().has(c.dataset.slot)!==painting) paintCell(c,painting);
+});
+const endPaint=()=>{ if(painting!==null){ painting=null; scheduleSave(); render(true);} };
+document.addEventListener("pointerup", endPaint); document.addEventListener("pointercancel", endPaint);
+document.addEventListener("click", e=>{
+  const c=e.target.closest("#hgrid .cell"); if(!c || c.disabled) return;
+  if(e.detail>0 && lastPtr!=="touch") return;
+  paintCell(c, !curSet().has(c.dataset.slot)); scheduleSave(); render(true);
+});
+
+/* ---------- boot ---------- */
+const DEMO_YOU_BLOCKS=[{d:0,s:840,e:1020},{d:2,s:600,e:780}], DEMO_YOU_WILLING=[{d:1,s:780,e:900},{d:4,s:720,e:840}];
+function startDemo(msg){
+  S.mode="demo"; S.me="demo-you"; S.demoMsg=msg; S.canWrite=true;
+  const T=today(), now=Date.now();
+  const next=(d,after=1)=>{ for(let k=after;k<after+7;k++){ const x=addDays(T,k); if(wd(x)===d) return iso(x);} };
+  const ago_=h=>new Date(now-h*36e5).toISOString();
+  S.pis={
+    priya:{name:"Priya N.",willing:[{d:2,s:600,e:720},{d:4,s:720,e:840}],level:"full",blocks:[{d:1,s:780,e:960},{d:3,s:840,e:1020}]}, marcus:{name:"Marcus T.",willing:[{d:1,s:780,e:900}],level:"provisional",blocks:[{d:0,s:600,e:780},{d:4,s:720,e:900}]},
+    dana:{name:"Dana R.",willing:[{d:2,s:600,e:720},{d:1,s:780,e:840}],level:"full",blocks:[{d:2,s:1020,e:1200},{d:4,s:720,e:900},{d:0,s:900,e:1080}]}, leo:{name:"Leo K.",willing:[{d:4,s:720,e:840},{d:0,s:840,e:960}],level:"provisional",blocks:[{d:1,s:600,e:780},{d:3,s:1080,e:1260}]},
+    ana:{name:"Ana S.",willing:[{d:2,s:600,e:660},{d:0,s:600,e:720}],level:"full",blocks:[{d:4,s:960,e:1140},{d:3,s:780,e:900},{d:1,s:840,e:1020}]}, jordan:{name:"Jordan W.",willing:[{d:1,s:780,e:900},{d:4,s:720,e:780}],level:"full",blocks:[{d:2,s:780,e:900},{d:3,s:600,e:720}]} };
+  S.trades={
+    t1:{by:"priya",level:"full",date:next(1),s:780,e:840,note:"Career fair that afternoon",wants:[{date:next(2),s:600,e:660}],status:"open",created:ago_(20)},
+    t1b:{by:"priya",level:"full",date:next(1),s:840,e:900,note:"Career fair that afternoon",wants:[{date:next(2),s:600,e:660}],status:"open",created:ago_(20)},
+    t2:{by:"marcus",level:"provisional",date:next(4),s:720,e:780,note:"",status:"open",created:ago_(5)},
+    t3:{by:"demo-you",level:"full",date:next(2),s:600,e:660,note:"Exam review session",wants:[{date:next(3),s:780,e:840}],status:"open",created:ago_(30)},
+    t4:{by:"dana",level:"full",date:next(4),s:720,e:780,note:"",status:"agreed",acceptedOffer:"o3",takerId:"demo-you",sumsBy:{dana:true},agreedAt:ago_(8),created:ago_(50)},
+    t5:{by:"leo",level:"provisional",date:next(3),s:1080,e:1140,note:"Flexible, can split it",status:"open",created:ago_(2)} };
+  S.offers={
+    o1:{trade:"t3",by:"dana",kind:"cover",note:"I'm around that morning anyway",status:"pending",created:ago_(10)},
+    o3:{trade:"t4",by:"demo-you",kind:"cover",note:"",status:"accepted",created:ago_(40)} };
+  S.msgs={
+    m3:{ch:"t:t3",trade:"t3",by:"dana",text:"Is the 10 AM start firm? I might be 10 minutes late.",created:ago_(9)},
+    m4:{ch:"t:t1",trade:"t1",by:"priya",to:"demo-you",kind:"ask",text:`Can you take this shift? I could take your ${dayLabel(next(2))} 10–11 AM in return.`,created:ago_(3)} };
+  S.mine={seen:{}};
+  S.admins={"a-john":{name:"John Overend", email:"(example)"}};
+  render(true);
+}
+function subscribe(db){
+  const lost = err=>{ if(err?.code!=="revoked") toast("Lost connection to the board. Reload to reconnect.",6000); };
+  db.doc("board/roster").onSnapshot(snap=>{
+    const all=(snap.exists && snap.data()?.pis) || {}, o={};
+    for(const [k,v] of Object.entries(all)) if(v) o[k]=v;
+    S.pis=o; S.rosterExists=snap.exists; S.loaded.pis=true; render();
+  }, lost);
+  db.collection("trades").onSnapshot(snap=>{
+    const t={}, of={}, ms={};
+    snap.docs.forEach(d=>{
+      const {offers, msgs, ...rest} = d.data()||{};
+      t[d.id]=rest;
+      for(const [k,v] of Object.entries(offers||{})) if(v) of[k]={...v, trade:d.id};
+      for(const [k,v] of Object.entries(msgs||{})) if(v) ms[k]={...v, trade:d.id, ch:"t:"+d.id};
+    });
+    S.trades=t; S.offers=of; S.msgs=ms; S.loaded.trades=S.loaded.offers=S.loaded.msgs=true;
+    purgePast(); render();
+  }, lost);
+  db.doc("config/studio").onSnapshot(snap=>{ S.config = snap.exists ? snap.data() : null; render(); }, ()=>{});
+}
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function supaLoadAll(){
+  const tables=["pis","trades","offers","msgs","config"];
+  const res = await Promise.all(tables.map(t=>S.sb.from(t).select("*").limit(5000)));
+  const bad = res.find(r=>r.error); if(bad) throw bad.error;
+  const [p,t,o,m,c] = res.map(r=>r.data||[]);
+  S.pis    = Object.fromEntries(p.map(r=>[r.id, r.data]));
+  S.trades = Object.fromEntries(t.map(r=>[r.id, r.data]));
+  S.offers = Object.fromEntries(o.map(r=>[r.id, {...r.data, trade:r.trade}]));
+  S.msgs   = Object.fromEntries(m.map(r=>[r.id, {...r.data, trade:r.trade, ch:"t:"+r.trade}]));
+  S.config = c.find(r=>r.id==="studio")?.data || null;
+  S.loaded.pis=S.loaded.trades=S.loaded.offers=S.loaded.msgs=true;
+  purgePast(); render();
+}
+function supaChange(tb,p){
+  if(tb==="admins"){ if(ui.admin) loadAdmins(); return; }
+  if(p.eventType==="DELETE"){ if(p.old?.id) localRemove(tb, p.old.id); }
+  else if(p.new?.id) localApply(tb, p.new.id, p.new.data||{}, p.new.trade);
+  if(tb==="trades") purgePast();
+  render();
+}
+function supaSubscribe(){
+  const ch=S.sb.channel("shift-board");
+  for(const tb of ["pis","trades","offers","msgs","config","admins"]) ch.on("postgres_changes", {event:"*", schema:"public", table:tb}, p=>supaChange(tb,p));
+  ch.subscribe(status=>{
+    if(status==="SUBSCRIBED"){ if(S.rtDropped){ S.rtDropped=false; supaLoadAll().catch(()=>{}); } }
+    else if(status==="CHANNEL_ERROR" || status==="TIMED_OUT" || status==="CLOSED") S.rtDropped=true;
+  });
+  // catch up after the tab has been in the background for a while
+  let hiddenAt=0;
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.visibilityState==="hidden") hiddenAt=Date.now();
+    else if(hiddenAt && Date.now()-hiddenAt>120000) supaLoadAll().catch(()=>{});
+  });
+}
+async function startSupabase(){
+  try{
+    await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js");
+    S.sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true, storageKey:"shift-board-auth"}});
+    let { data:{ session } } = await S.sb.auth.getSession();
+    if(!session){
+      const r = await S.sb.auth.signInAnonymously();
+      if(r.error) throw r.error;
+    }
+    S.backend="supa"; S.mode="live"; S.canWrite=true;
+    S.sb.auth.onAuthStateChange((_e, sess)=>{ S.uid = sess?.user?.id || null; });
+    await checkAdmin();
+    let me=null; try{ me=localStorage.getItem("st-me"); }catch(e){}
+    S.me=me; try{ S.mine = JSON.parse(localStorage.getItem("st-seen-"+me)||"null") || {seen:{}}; }catch(e){}
+    await supaLoadAll();
+    supaSubscribe();
+    render(true);
+  }catch(e){
+    console.error(e);
+    startDemo(/anonymous/i.test(e?.message||"") ? "Couldn't sign in to Supabase. Turn on anonymous sign-ins (see the setup notes)."
+      : /relation|does not exist|schema cache/i.test(e?.message||"") ? "Supabase is connected, but its tables aren't set up yet. Run supabase-setup.sql."
+      : "Couldn't connect to Supabase. Check the URL and key at the top of the file.");
+  }
+}
+async function boot(){
+  if(location.hash==="#admin") ui.tab="admin";
+  render(true);
+  if(window.claude?.use){
+    const [db,user]=await Promise.all([claude.use("db"), claude.use("user")]);
+    if(db){
+      S.db=db; S.user=user; S.backend="claude"; S.me = user ? await user.id() : null; try{ S.profileName = user ? await user.name() : ""; }catch(e){}
+      const cw = user ? await user.can("data.write") : null;
+      if(cw===false || !S.me) S.canWrite=false;
+      ui.admin = user ? await user.isOwner() : false;
+      S.admins = {owner:{name:"John Overend", email:"Board owner"}};
+      if(!S.me) S.me="__nobody__";
+      else { try{ const st=await db.doc(`data/users/${S.me}/state`).get(); if(st.exists) S.mine={seen:{}, ...st.data()}; }catch(e){} }
+      S.mode="live"; subscribe(db); return;
+    }
+  }
+  if(SUPABASE_URL && SUPABASE_KEY){ await startSupabase(); return; }
+  startDemo("This copy isn't connected to shared storage yet. Add your Supabase URL and key at the top of the file.");
+}
+window.addEventListener("hashchange", ()=>{ if(location.hash==="#admin"){ ui.tab="admin"; render(true); } });
+boot();
+</script>
+
+</body>
+</html>
